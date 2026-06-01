@@ -7,6 +7,8 @@
 		<GenerateDependencyFile>false</GenerateDependencyFile>
 		<ProduceReferenceAssembly>false</ProduceReferenceAssembly>
 		<GenerateDocumentationFile>True</GenerateDocumentationFile>
+		<!-- CS1591 = missing XML doc comment on a public member -->
+		<NoWarn>$(NoWarn);CS1591</NoWarn>
 		<PathMap>$(MSBuildProjectDirectory)=$(MSBuildProjectName)</PathMap>
 		<AssemblyVersion>2.1</AssemblyVersion>
 	</PropertyGroup>
