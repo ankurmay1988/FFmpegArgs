@@ -83,6 +83,14 @@
         /// </summary>
         public LibplaceboFilterGen pad_crop_ratio(float pad_crop_ratio) => this.SetOptionRange("pad_crop_ratio", pad_crop_ratio, 0, 1);
         /// <summary>
+        ///  Content fit strategy for placing input layers in the output (from 0 to 4) (default fill)
+        /// </summary>
+        public LibplaceboFilterGen fit_mode(LibplaceboFilterGenFit_mode fit_mode) => this.SetOption("fit_mode", fit_mode.GetEnumAttribute<NameAttribute>().Name);
+        /// <summary>
+        ///  Output size strategy (for the base layer only) (from 0 to 1) (default target)
+        /// </summary>
+        public LibplaceboFilterGen fit_sense(LibplaceboFilterGenFit_sense fit_sense) => this.SetOption("fit_sense", fit_sense.GetEnumAttribute<NameAttribute>().Name);
+        /// <summary>
         ///  Background fill color (default &quot;black@0&quot;)
         /// </summary>
         public LibplaceboFilterGen fillcolor(Color fillcolor) => this.SetOption("fillcolor", fillcolor.ToHexStringRGBA());
@@ -115,17 +123,25 @@
         /// </summary>
         public LibplaceboFilterGen range(LibplaceboFilterGenRange range) => this.SetOption("range", range.GetEnumAttribute<NameAttribute>().Name);
         /// <summary>
-        ///  select color primaries (from -1 to 22) (default auto)
+        ///  select color primaries (from -1 to 256) (default auto)
         /// </summary>
         public LibplaceboFilterGen color_primaries(LibplaceboFilterGenColor_primaries color_primaries) => this.SetOption("color_primaries", color_primaries.GetEnumAttribute<NameAttribute>().Name);
         /// <summary>
-        ///  select color transfer (from -1 to 18) (default auto)
+        ///  select color transfer (from -1 to 256) (default auto)
         /// </summary>
         public LibplaceboFilterGen color_trc(LibplaceboFilterGenColor_trc color_trc) => this.SetOption("color_trc", color_trc.GetEnumAttribute<NameAttribute>().Name);
+        /// <summary>
+        ///  select chroma location (from -1 to 6) (default auto)
+        /// </summary>
+        public LibplaceboFilterGen chroma_location(LibplaceboFilterGenChroma_location chroma_location) => this.SetOption("chroma_location", chroma_location.GetEnumAttribute<NameAttribute>().Name);
         /// <summary>
         ///  rotate the input clockwise (from 0 to 4) (default 0)
         /// </summary>
         public LibplaceboFilterGen rotate(LibplaceboFilterGenRotate rotate) => this.SetOption("rotate", rotate.GetEnumAttribute<NameAttribute>().Name);
+        /// <summary>
+        ///  select alpha moda (from -1 to 2) (default auto)
+        /// </summary>
+        public LibplaceboFilterGen alpha_mode(LibplaceboFilterGenAlpha_mode alpha_mode) => this.SetOption("alpha_mode", alpha_mode.GetEnumAttribute<NameAttribute>().Name);
         /// <summary>
         ///  Upscaler function (default &quot;spline36&quot;)
         /// </summary>
@@ -207,19 +223,23 @@
         /// </summary>
         public LibplaceboFilterGen gamma(float gamma) => this.SetOptionRange("gamma", gamma, 0, 16);
         /// <summary>
+        ///  Color temperature adjustment (kelvin) (from 1667 to 25000) (default 6500)
+        /// </summary>
+        public LibplaceboFilterGen temperature(float temperature) => this.SetOptionRange("temperature", temperature, 1667, 25000);
+        /// <summary>
         ///  Enable dynamic peak detection for HDR tone-mapping (default true)
         /// </summary>
         public LibplaceboFilterGen peak_detect(bool peak_detect) => this.SetOption("peak_detect", peak_detect.ToFFmpegFlag());
         /// <summary>
-        ///  Peak detection smoothing period (from 0 to 1000) (default 100)
+        ///  Peak detection smoothing period (from 0 to 1000) (default 20)
         /// </summary>
         public LibplaceboFilterGen smoothing_period(float smoothing_period) => this.SetOptionRange("smoothing_period", smoothing_period, 0, 1000);
         /// <summary>
-        ///  Scene change low threshold (from -1 to 100) (default 5.5)
+        ///  Scene change low threshold (from -1 to 100) (default 1)
         /// </summary>
         public LibplaceboFilterGen scene_threshold_low(float scene_threshold_low) => this.SetOptionRange("scene_threshold_low", scene_threshold_low, -1, 100);
         /// <summary>
-        ///  Scene change high threshold (from -1 to 100) (default 10)
+        ///  Scene change high threshold (from -1 to 100) (default 3)
         /// </summary>
         public LibplaceboFilterGen scene_threshold_high(float scene_threshold_high) => this.SetOptionRange("scene_threshold_high", scene_threshold_high, -1, 100);
         /// <summary>
@@ -324,6 +344,60 @@
         /// </summary>
         [FFmpegArgs.Cores.Attributes.NameAttribute("increase")]
         increase = 2
+    }
+
+    /// <summary>
+    ///  Content fit strategy for placing input layers in the output (from 0 to 4) (default fill)
+    /// </summary>
+    public enum LibplaceboFilterGenFit_mode
+    {
+        /// <summary>
+        /// fill            0            ..FV....... Stretch content, ignoring aspect ratio
+        /// </summary>
+        [FFmpegArgs.Cores.Attributes.NameAttribute("fill")]
+        fill = 0,
+        /// <summary>
+        /// contain         1            ..FV....... Stretch content, padding to preserve aspect
+        /// </summary>
+        [FFmpegArgs.Cores.Attributes.NameAttribute("contain")]
+        contain = 1,
+        /// <summary>
+        /// cover           2            ..FV....... Stretch content, cropping to preserve aspect
+        /// </summary>
+        [FFmpegArgs.Cores.Attributes.NameAttribute("cover")]
+        cover = 2,
+        /// <summary>
+        /// none            3            ..FV....... Keep input unscaled, padding and cropping as needed
+        /// </summary>
+        [FFmpegArgs.Cores.Attributes.NameAttribute("none")]
+        none = 3,
+        /// <summary>
+        /// place           3            ..FV....... Keep input unscaled, padding and cropping as needed
+        /// </summary>
+        [FFmpegArgs.Cores.Attributes.NameAttribute("place")]
+        place = 3,
+        /// <summary>
+        /// scale_down      4            ..FV....... Downscale only if larger, padding to preserve aspect
+        /// </summary>
+        [FFmpegArgs.Cores.Attributes.NameAttribute("scale_down")]
+        scale_down = 4
+    }
+
+    /// <summary>
+    ///  Output size strategy (for the base layer only) (from 0 to 1) (default target)
+    /// </summary>
+    public enum LibplaceboFilterGenFit_sense
+    {
+        /// <summary>
+        /// target          0            ..FV....... Computed resolution is the exact output size
+        /// </summary>
+        [FFmpegArgs.Cores.Attributes.NameAttribute("target")]
+        target = 0,
+        /// <summary>
+        /// constraint      1            ..FV....... Computed resolution constrains the output size
+        /// </summary>
+        [FFmpegArgs.Cores.Attributes.NameAttribute("constraint")]
+        constraint = 1
     }
 
     /// <summary>
@@ -468,7 +542,7 @@
     }
 
     /// <summary>
-    ///  select color primaries (from -1 to 22) (default auto)
+    ///  select color primaries (from -1 to 256) (default auto)
     /// </summary>
     public enum LibplaceboFilterGenColor_primaries
     {
@@ -541,11 +615,16 @@
         /// ebu3213         22           ..FV.......
         /// </summary>
         [FFmpegArgs.Cores.Attributes.NameAttribute("ebu3213")]
-        ebu3213 = 22
+        ebu3213 = 22,
+        /// <summary>
+        /// vgamut          256          ..FV.......
+        /// </summary>
+        [FFmpegArgs.Cores.Attributes.NameAttribute("vgamut")]
+        vgamut = 256
     }
 
     /// <summary>
-    ///  select color transfer (from -1 to 18) (default auto)
+    ///  select color transfer (from -1 to 256) (default auto)
     /// </summary>
     public enum LibplaceboFilterGenColor_trc
     {
@@ -623,7 +702,64 @@
         /// arib-std-b67    18           ..FV.......
         /// </summary>
         [FFmpegArgs.Cores.Attributes.NameAttribute("arib-std-b67")]
-        arib_std_b67 = 18
+        arib_std_b67 = 18,
+        /// <summary>
+        /// vlog            256          ..FV.......
+        /// </summary>
+        [FFmpegArgs.Cores.Attributes.NameAttribute("vlog")]
+        vlog = 256
+    }
+
+    /// <summary>
+    ///  select chroma location (from -1 to 6) (default auto)
+    /// </summary>
+    public enum LibplaceboFilterGenChroma_location
+    {
+        /// <summary>
+        /// auto            -1           ..FV....... keep the same chroma location
+        /// </summary>
+        [FFmpegArgs.Cores.Attributes.NameAttribute("auto")]
+        auto = -1,
+        /// <summary>
+        /// unspecified     0            ..FV.......
+        /// </summary>
+        [FFmpegArgs.Cores.Attributes.NameAttribute("unspecified")]
+        unspecified = 0,
+        /// <summary>
+        /// unknown         0            ..FV.......
+        /// </summary>
+        [FFmpegArgs.Cores.Attributes.NameAttribute("unknown")]
+        unknown = 0,
+        /// <summary>
+        /// left            1            ..FV.......
+        /// </summary>
+        [FFmpegArgs.Cores.Attributes.NameAttribute("left")]
+        left = 1,
+        /// <summary>
+        /// center          2            ..FV.......
+        /// </summary>
+        [FFmpegArgs.Cores.Attributes.NameAttribute("center")]
+        center = 2,
+        /// <summary>
+        /// topleft         3            ..FV.......
+        /// </summary>
+        [FFmpegArgs.Cores.Attributes.NameAttribute("topleft")]
+        topleft = 3,
+        /// <summary>
+        /// top             4            ..FV.......
+        /// </summary>
+        [FFmpegArgs.Cores.Attributes.NameAttribute("top")]
+        top = 4,
+        /// <summary>
+        /// bottomleft      5            ..FV.......
+        /// </summary>
+        [FFmpegArgs.Cores.Attributes.NameAttribute("bottomleft")]
+        bottomleft = 5,
+        /// <summary>
+        /// bottom          6            ..FV.......
+        /// </summary>
+        [FFmpegArgs.Cores.Attributes.NameAttribute("bottom")]
+        bottom = 6
     }
 
     /// <summary>
@@ -659,6 +795,38 @@
     }
 
     /// <summary>
+    ///  select alpha moda (from -1 to 2) (default auto)
+    /// </summary>
+    public enum LibplaceboFilterGenAlpha_mode
+    {
+        /// <summary>
+        /// auto            -1           ..FV.....T. keep the same alpha mode
+        /// </summary>
+        [FFmpegArgs.Cores.Attributes.NameAttribute("auto")]
+        auto = -1,
+        /// <summary>
+        /// unspecified     0            ..FV.....T.
+        /// </summary>
+        [FFmpegArgs.Cores.Attributes.NameAttribute("unspecified")]
+        unspecified = 0,
+        /// <summary>
+        /// unknown         0            ..FV.....T.
+        /// </summary>
+        [FFmpegArgs.Cores.Attributes.NameAttribute("unknown")]
+        unknown = 0,
+        /// <summary>
+        /// premultiplied   1            ..FV.....T.
+        /// </summary>
+        [FFmpegArgs.Cores.Attributes.NameAttribute("premultiplied")]
+        premultiplied = 1,
+        /// <summary>
+        /// straight        2            ..FV.....T.
+        /// </summary>
+        [FFmpegArgs.Cores.Attributes.NameAttribute("straight")]
+        straight = 2
+    }
+
+    /// <summary>
     ///  Deinterlacing mode (from 0 to 3) (default weave)
     /// </summary>
     public enum LibplaceboFilterGenDeinterlace
@@ -677,7 +845,12 @@
         /// yadif           2            ..FV....... Yet another deinterlacing filter
         /// </summary>
         [FFmpegArgs.Cores.Attributes.NameAttribute("yadif")]
-        yadif = 2
+        yadif = 2,
+        /// <summary>
+        /// bwdif           3            ..FV....... Bob weaver deinterlacing filter
+        /// </summary>
+        [FFmpegArgs.Cores.Attributes.NameAttribute("bwdif")]
+        bwdif = 3
     }
 
     /// <summary>

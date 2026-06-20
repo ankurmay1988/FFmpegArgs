@@ -700,6 +700,11 @@
         [FFmpegArgs.Cores.Attributes.NameAttribute("hnm")]
         hnm,
         /// <summary>
+        /// HXVF/HXVS IP camera format
+        /// </summary>
+        [FFmpegArgs.Cores.Attributes.NameAttribute("hxvs")]
+        hxvs,
+        /// <summary>
         /// Raw Immersive Audio Model and Formats
         /// </summary>
         [FFmpegArgs.Cores.Attributes.NameAttribute("iamf")]
@@ -820,6 +825,11 @@
         [FFmpegArgs.Cores.Attributes.NameAttribute("jpegxl_pipe")]
         jpegxl_pipe,
         /// <summary>
+        /// piped jpegxs sequence
+        /// </summary>
+        [FFmpegArgs.Cores.Attributes.NameAttribute("jpegxs_pipe")]
+        jpegxs_pipe,
+        /// <summary>
         /// Bitmap Brothers JV
         /// </summary>
         [FFmpegArgs.Cores.Attributes.NameAttribute("jv")]
@@ -850,10 +860,20 @@
         [FFmpegArgs.Cores.Attributes.NameAttribute("lc3")]
         lc3,
         /// <summary>
+        /// 
+        /// </summary>
+        [FFmpegArgs.Cores.Attributes.NameAttribute("libcdio")]
+        libcdio,
+        /// <summary>
         /// Game Music Emu demuxer
         /// </summary>
         [FFmpegArgs.Cores.Attributes.NameAttribute("libgme")]
         libgme,
+        /// <summary>
+        /// ModPlug demuxer
+        /// </summary>
+        [FFmpegArgs.Cores.Attributes.NameAttribute("libmodplug")]
+        libmodplug,
         /// <summary>
         /// Tracker formats (libopenmpt)
         /// </summary>

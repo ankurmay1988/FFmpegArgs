@@ -27,7 +27,7 @@
         /// </summary>
         public ZscaleFilterGen dither(ZscaleFilterGenDither dither) => this.SetOption("dither", dither.GetEnumAttribute<NameAttribute>().Name);
         /// <summary>
-        ///  set filter type (from 0 to 5) (default bilinear)
+        ///  set filter type (from 0 to 6) (default bilinear)
         /// </summary>
         public ZscaleFilterGen filter(ZscaleFilterGenFilter filter) => this.SetOption("filter", filter.GetEnumAttribute<NameAttribute>().Name);
         /// <summary>
@@ -148,7 +148,7 @@
     }
 
     /// <summary>
-    ///  set filter type (from 0 to 5) (default bilinear)
+    ///  set filter type (from 0 to 6) (default bilinear)
     /// </summary>
     public enum ZscaleFilterGenFilter
     {
@@ -177,6 +177,11 @@
         /// </summary>
         [FFmpegArgs.Cores.Attributes.NameAttribute("spline36")]
         spline36 = 4,
+        /// <summary>
+        /// spline64        6            ..FV.......
+        /// </summary>
+        [FFmpegArgs.Cores.Attributes.NameAttribute("spline64")]
+        spline64 = 6,
         /// <summary>
         /// lanczos         5            ..FV.......
         /// </summary>

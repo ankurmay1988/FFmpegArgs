@@ -31,11 +31,11 @@
         /// </summary>
         public Find_rectFilterGen ymin(int ymin) => this.SetOptionRange("ymin", ymin, 0, INT_MAX);
         /// <summary>
-        ///   (from 0 to INT_MAX) (default 0)
+        ///   (from 0 to INT_MAX) (default INT_MAX)
         /// </summary>
         public Find_rectFilterGen xmax(int xmax) => this.SetOptionRange("xmax", xmax, 0, INT_MAX);
         /// <summary>
-        ///   (from 0 to INT_MAX) (default 0)
+        ///   (from 0 to INT_MAX) (default INT_MAX)
         /// </summary>
         public Find_rectFilterGen ymax(int ymax) => this.SetOptionRange("ymax", ymax, 0, INT_MAX);
         /// <summary>

@@ -1,9 +1,9 @@
 ﻿namespace FFmpegArgs.Filters.Generated
 {
     /// <summary>
-    /// TSC aap               AA-&gt;A      Apply Affine Projection algorithm to first audio stream.
+    /// TS aap               AA-&gt;A      Apply Affine Projection algorithm to first audio stream.
     /// </summary>
-    public class AapFilterGen : AudioToAudioFilter, ITimelineSupport, ISliceThreading, ICommandSupport
+    public class AapFilterGen : AudioToAudioFilter, ITimelineSupport, ISliceThreading
     {
         internal AapFilterGen(params AudioMap[] inputs) : base("aap", inputs)
         {

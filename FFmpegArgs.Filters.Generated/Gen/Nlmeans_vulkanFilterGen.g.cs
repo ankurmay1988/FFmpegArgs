@@ -11,37 +11,37 @@
         }
 
         /// <summary>
-        ///  denoising strength for all components (from 1 to 100) (default 1)
+        ///  denoising strength for all components (from 0 to 100) (default 1)
         /// </summary>
-        public Nlmeans_vulkanFilterGen s(double s) => this.SetOptionRange("s", s, 1, 100);
+        public Nlmeans_vulkanFilterGen s(double s) => this.SetOptionRange("s", s, 0, 100);
         /// <summary>
         ///  patch size for all components (from 0 to 99) (default 7)
         /// </summary>
         public Nlmeans_vulkanFilterGen p(int p) => this.SetOptionRange("p", p, 0, 99);
         /// <summary>
-        ///  research window radius (from 0 to 99) (default 15)
+        ///  research window size (from 0 to 99) (default 15)
         /// </summary>
         public Nlmeans_vulkanFilterGen r(int r) => this.SetOptionRange("r", r, 0, 99);
         /// <summary>
-        ///  parallelism (from 1 to 168) (default 36)
+        ///  parallelism (from 1 to 64) (default 8)
         /// </summary>
-        public Nlmeans_vulkanFilterGen t(int t) => this.SetOptionRange("t", t, 1, 168);
+        public Nlmeans_vulkanFilterGen t(int t) => this.SetOptionRange("t", t, 1, 64);
         /// <summary>
-        ///  denoising strength for component 1 (from 1 to 100) (default 1)
+        ///  denoising strength for component 1 (from 0 to 100) (default nan)
         /// </summary>
-        public Nlmeans_vulkanFilterGen s1(double s1) => this.SetOptionRange("s1", s1, 1, 100);
+        public Nlmeans_vulkanFilterGen s1(double s1) => this.SetOptionRange("s1", s1, 0, 100);
         /// <summary>
-        ///  denoising strength for component 2 (from 1 to 100) (default 1)
+        ///  denoising strength for component 2 (from 0 to 100) (default nan)
         /// </summary>
-        public Nlmeans_vulkanFilterGen s2(double s2) => this.SetOptionRange("s2", s2, 1, 100);
+        public Nlmeans_vulkanFilterGen s2(double s2) => this.SetOptionRange("s2", s2, 0, 100);
         /// <summary>
-        ///  denoising strength for component 3 (from 1 to 100) (default 1)
+        ///  denoising strength for component 3 (from 0 to 100) (default nan)
         /// </summary>
-        public Nlmeans_vulkanFilterGen s3(double s3) => this.SetOptionRange("s3", s3, 1, 100);
+        public Nlmeans_vulkanFilterGen s3(double s3) => this.SetOptionRange("s3", s3, 0, 100);
         /// <summary>
-        ///  denoising strength for component 4 (from 1 to 100) (default 1)
+        ///  denoising strength for component 4 (from 0 to 100) (default nan)
         /// </summary>
-        public Nlmeans_vulkanFilterGen s4(double s4) => this.SetOptionRange("s4", s4, 1, 100);
+        public Nlmeans_vulkanFilterGen s4(double s4) => this.SetOptionRange("s4", s4, 0, 100);
         /// <summary>
         ///  patch size for component 1 (from 0 to 99) (default 0)
         /// </summary>

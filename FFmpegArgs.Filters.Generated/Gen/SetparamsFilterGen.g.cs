@@ -19,11 +19,11 @@
         /// </summary>
         public SetparamsFilterGen range(SetparamsFilterGenRange range) => this.SetOption("range", range.GetEnumAttribute<NameAttribute>().Name);
         /// <summary>
-        ///  select color primaries (from -1 to 22) (default auto)
+        ///  select color primaries (from -1 to 256) (default auto)
         /// </summary>
         public SetparamsFilterGen color_primaries(SetparamsFilterGenColor_primaries color_primaries) => this.SetOption("color_primaries", color_primaries.GetEnumAttribute<NameAttribute>().Name);
         /// <summary>
-        ///  select color transfer (from -1 to 18) (default auto)
+        ///  select color transfer (from -1 to 256) (default auto)
         /// </summary>
         public SetparamsFilterGen color_trc(SetparamsFilterGenColor_trc color_trc) => this.SetOption("color_trc", color_trc.GetEnumAttribute<NameAttribute>().Name);
         /// <summary>
@@ -34,6 +34,10 @@
         ///  select chroma sample location (from -1 to 6) (default auto)
         /// </summary>
         public SetparamsFilterGen chroma_location(SetparamsFilterGenChroma_location chroma_location) => this.SetOption("chroma_location", chroma_location.GetEnumAttribute<NameAttribute>().Name);
+        /// <summary>
+        ///  select alpha moda (from -1 to 2) (default auto)
+        /// </summary>
+        public SetparamsFilterGen alpha_mode(SetparamsFilterGenAlpha_mode alpha_mode) => this.SetOption("alpha_mode", alpha_mode.GetEnumAttribute<NameAttribute>().Name);
     }
 
     /// <summary>
@@ -116,7 +120,7 @@
     }
 
     /// <summary>
-    ///  select color primaries (from -1 to 22) (default auto)
+    ///  select color primaries (from -1 to 256) (default auto)
     /// </summary>
     public enum SetparamsFilterGenColor_primaries
     {
@@ -189,11 +193,16 @@
         /// ebu3213         22           ..FV.......
         /// </summary>
         [FFmpegArgs.Cores.Attributes.NameAttribute("ebu3213")]
-        ebu3213 = 22
+        ebu3213 = 22,
+        /// <summary>
+        /// vgamut          256          ..FV.......
+        /// </summary>
+        [FFmpegArgs.Cores.Attributes.NameAttribute("vgamut")]
+        vgamut = 256
     }
 
     /// <summary>
-    ///  select color transfer (from -1 to 18) (default auto)
+    ///  select color transfer (from -1 to 256) (default auto)
     /// </summary>
     public enum SetparamsFilterGenColor_trc
     {
@@ -286,7 +295,12 @@
         /// arib-std-b67    18           ..FV.......
         /// </summary>
         [FFmpegArgs.Cores.Attributes.NameAttribute("arib-std-b67")]
-        arib_std_b67 = 18
+        arib_std_b67 = 18,
+        /// <summary>
+        /// vlog            256          ..FV.......
+        /// </summary>
+        [FFmpegArgs.Cores.Attributes.NameAttribute("vlog")]
+        vlog = 256
     }
 
     /// <summary>
@@ -436,6 +450,38 @@
         /// </summary>
         [FFmpegArgs.Cores.Attributes.NameAttribute("bottom")]
         bottom = 6
+    }
+
+    /// <summary>
+    ///  select alpha moda (from -1 to 2) (default auto)
+    /// </summary>
+    public enum SetparamsFilterGenAlpha_mode
+    {
+        /// <summary>
+        /// auto            -1           ..FV....... keep the same alpha mode
+        /// </summary>
+        [FFmpegArgs.Cores.Attributes.NameAttribute("auto")]
+        auto = -1,
+        /// <summary>
+        /// unspecified     0            ..FV.......
+        /// </summary>
+        [FFmpegArgs.Cores.Attributes.NameAttribute("unspecified")]
+        unspecified = 0,
+        /// <summary>
+        /// unknown         0            ..FV.......
+        /// </summary>
+        [FFmpegArgs.Cores.Attributes.NameAttribute("unknown")]
+        unknown = 0,
+        /// <summary>
+        /// premultiplied   1            ..FV.......
+        /// </summary>
+        [FFmpegArgs.Cores.Attributes.NameAttribute("premultiplied")]
+        premultiplied = 1,
+        /// <summary>
+        /// straight        2            ..FV.......
+        /// </summary>
+        [FFmpegArgs.Cores.Attributes.NameAttribute("straight")]
+        straight = 2
     }
 
     public static partial class FilterGeneratedExtensions

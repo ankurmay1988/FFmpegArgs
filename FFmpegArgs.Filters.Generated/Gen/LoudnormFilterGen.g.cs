@@ -78,6 +78,10 @@
         ///  set print format for stats (from 0 to 2) (default none)
         /// </summary>
         public LoudnormFilterGen print_format(LoudnormFilterGenPrint_format print_format) => this.SetOption("print_format", print_format.GetEnumAttribute<NameAttribute>().Name);
+        /// <summary>
+        ///  set stats output file
+        /// </summary>
+        public LoudnormFilterGen stats_file(String stats_file) => this.SetOption("stats_file", stats_file.ToString());
     }
 
     /// <summary>

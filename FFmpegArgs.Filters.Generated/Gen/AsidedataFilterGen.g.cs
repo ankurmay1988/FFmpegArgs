@@ -123,10 +123,15 @@
         [FFmpegArgs.Cores.Attributes.NameAttribute("ICC_PROFILE")]
         ICC_PROFILE = 15,
         /// <summary>
-        /// S12M_TIMECOD    16           ..F.A......
+        /// S12M_TIMECOD    16           ..F.A.....P
         /// </summary>
         [FFmpegArgs.Cores.Attributes.NameAttribute("S12M_TIMECOD")]
         S12M_TIMECOD = 16,
+        /// <summary>
+        /// S12M_TIMECODE   16           ..F.A......
+        /// </summary>
+        [FFmpegArgs.Cores.Attributes.NameAttribute("S12M_TIMECODE")]
+        S12M_TIMECODE = 16,
         /// <summary>
         /// DYNAMIC_HDR_PLUS 17           ..F.A......
         /// </summary>

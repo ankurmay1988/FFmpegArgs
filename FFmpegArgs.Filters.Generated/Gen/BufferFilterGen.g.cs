@@ -50,6 +50,10 @@
         ///  select color range (from 0 to 2) (default unspecified)
         /// </summary>
         public BufferFilterGen range(BufferFilterGenRange range) => this.SetOption("range", range.GetEnumAttribute<NameAttribute>().Name);
+        /// <summary>
+        ///  select alpha mode (from 0 to 2) (default unspecified)
+        /// </summary>
+        public BufferFilterGen alpha_mode(BufferFilterGenAlpha_mode alpha_mode) => this.SetOption("alpha_mode", alpha_mode.GetEnumAttribute<NameAttribute>().Name);
     }
 
     /// <summary>
@@ -189,6 +193,33 @@
         /// </summary>
         [FFmpegArgs.Cores.Attributes.NameAttribute("jpeg")]
         jpeg = 2
+    }
+
+    /// <summary>
+    ///  select alpha mode (from 0 to 2) (default unspecified)
+    /// </summary>
+    public enum BufferFilterGenAlpha_mode
+    {
+        /// <summary>
+        /// unspecified     0            ..FV.......
+        /// </summary>
+        [FFmpegArgs.Cores.Attributes.NameAttribute("unspecified")]
+        unspecified = 0,
+        /// <summary>
+        /// unknown         0            ..FV.......
+        /// </summary>
+        [FFmpegArgs.Cores.Attributes.NameAttribute("unknown")]
+        unknown = 0,
+        /// <summary>
+        /// straight        2            ..FV.......
+        /// </summary>
+        [FFmpegArgs.Cores.Attributes.NameAttribute("straight")]
+        straight = 2,
+        /// <summary>
+        /// premultiplied   1            ..FV.......
+        /// </summary>
+        [FFmpegArgs.Cores.Attributes.NameAttribute("premultiplied")]
+        premultiplied = 1
     }
 
     public static partial class FilterGeneratedExtensions

@@ -31,7 +31,7 @@
         /// </summary>
         public CompensationdelayFilterGen wet(double wet) => this.SetOptionRange("wet", wet, 0, 1);
         /// <summary>
-        ///  set temperature ┬░C (from -50 to 50) (default 20)
+        ///  set temperature &#176;C (from -50 to 50) (default 20)
         /// </summary>
         public CompensationdelayFilterGen temp(int temp) => this.SetOptionRange("temp", temp, -50, 50);
     }

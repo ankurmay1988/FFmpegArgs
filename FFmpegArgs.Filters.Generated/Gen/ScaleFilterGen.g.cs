@@ -138,6 +138,11 @@
         [FFmpegArgs.Cores.Attributes.NameAttribute("smpte170m")]
         smpte170m = 5,
         /// <summary>
+        /// bt470bg         5            ..FV.......
+        /// </summary>
+        [FFmpegArgs.Cores.Attributes.NameAttribute("bt470bg")]
+        bt470bg = 5,
+        /// <summary>
         /// bt709           1            ..FV.......
         /// </summary>
         [FFmpegArgs.Cores.Attributes.NameAttribute("bt709")]
@@ -156,7 +161,12 @@
         /// bt2020          9            ..FV.......
         /// </summary>
         [FFmpegArgs.Cores.Attributes.NameAttribute("bt2020")]
-        bt2020 = 9
+        bt2020 = 9,
+        /// <summary>
+        /// bt2020nc        9            ..FV.......
+        /// </summary>
+        [FFmpegArgs.Cores.Attributes.NameAttribute("bt2020nc")]
+        bt2020nc = 9
     }
 
     /// <summary>
@@ -185,6 +195,11 @@
         [FFmpegArgs.Cores.Attributes.NameAttribute("smpte170m")]
         smpte170m = 5,
         /// <summary>
+        /// bt470bg         5            ..FV.......
+        /// </summary>
+        [FFmpegArgs.Cores.Attributes.NameAttribute("bt470bg")]
+        bt470bg = 5,
+        /// <summary>
         /// bt709           1            ..FV.......
         /// </summary>
         [FFmpegArgs.Cores.Attributes.NameAttribute("bt709")]
@@ -203,7 +218,12 @@
         /// bt2020          9            ..FV.......
         /// </summary>
         [FFmpegArgs.Cores.Attributes.NameAttribute("bt2020")]
-        bt2020 = 9
+        bt2020 = 9,
+        /// <summary>
+        /// bt2020nc        9            ..FV.......
+        /// </summary>
+        [FFmpegArgs.Cores.Attributes.NameAttribute("bt2020nc")]
+        bt2020nc = 9
     }
 
     /// <summary>

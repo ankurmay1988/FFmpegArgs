@@ -160,6 +160,11 @@
         [FFmpegArgs.Cores.Attributes.NameAttribute("bit")]
         bit,
         /// <summary>
+        /// caca (color ASCII art) output device
+        /// </summary>
+        [FFmpegArgs.Cores.Attributes.NameAttribute("caca")]
+        caca,
+        /// <summary>
         /// Apple CAF (Core Audio Format)
         /// </summary>
         [FFmpegArgs.Cores.Attributes.NameAttribute("caf")]

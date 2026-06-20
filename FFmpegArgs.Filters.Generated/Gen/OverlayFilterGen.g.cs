@@ -39,7 +39,7 @@
         /// </summary>
         public OverlayFilterGen repeatlast(bool repeatlast) => this.SetOption("repeatlast", repeatlast.ToFFmpegFlag());
         /// <summary>
-        ///  alpha format (from 0 to 1) (default straight)
+        ///  alpha format (from 0 to 2) (default auto)
         /// </summary>
         public OverlayFilterGen alpha(OverlayFilterGenAlpha alpha) => this.SetOption("alpha", alpha.GetEnumAttribute<NameAttribute>().Name);
     }
@@ -136,15 +136,25 @@
     }
 
     /// <summary>
-    ///  alpha format (from 0 to 1) (default straight)
+    ///  alpha format (from 0 to 2) (default auto)
     /// </summary>
     public enum OverlayFilterGenAlpha
     {
         /// <summary>
-        /// straight        0            ..FV.......
+        /// auto            0            ..FV.......
+        /// </summary>
+        [FFmpegArgs.Cores.Attributes.NameAttribute("auto")]
+        auto = 0,
+        /// <summary>
+        /// unknown         0            ..FV.......
+        /// </summary>
+        [FFmpegArgs.Cores.Attributes.NameAttribute("unknown")]
+        unknown = 0,
+        /// <summary>
+        /// straight        2            ..FV.......
         /// </summary>
         [FFmpegArgs.Cores.Attributes.NameAttribute("straight")]
-        straight = 0,
+        straight = 2,
         /// <summary>
         /// premultiplied   1            ..FV.......
         /// </summary>

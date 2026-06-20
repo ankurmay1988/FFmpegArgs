@@ -76,22 +76,22 @@
         [FFmpegArgs.Cores.Attributes.NameAttribute("cd")]
         cd = 4,
         /// <summary>
-        /// 50fm            5            ..F.A....T. 50┬╡s (FM)
+        /// 50fm            5            ..F.A....T. 50&#181;s (FM)
         /// </summary>
         [FFmpegArgs.Cores.Attributes.NameAttribute("50fm")]
         _50fm = 5,
         /// <summary>
-        /// 75fm            6            ..F.A....T. 75┬╡s (FM)
+        /// 75fm            6            ..F.A....T. 75&#181;s (FM)
         /// </summary>
         [FFmpegArgs.Cores.Attributes.NameAttribute("75fm")]
         _75fm = 6,
         /// <summary>
-        /// 50kf            7            ..F.A....T. 50┬╡s (FM-KF)
+        /// 50kf            7            ..F.A....T. 50&#181;s (FM-KF)
         /// </summary>
         [FFmpegArgs.Cores.Attributes.NameAttribute("50kf")]
         _50kf = 7,
         /// <summary>
-        /// 75kf            8            ..F.A....T. 75┬╡s (FM-KF)
+        /// 75kf            8            ..F.A....T. 75&#181;s (FM-KF)
         /// </summary>
         [FFmpegArgs.Cores.Attributes.NameAttribute("75kf")]
         _75kf = 8

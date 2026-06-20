@@ -23,11 +23,11 @@
         /// </summary>
         public ColorspaceFilterGen range(ColorspaceFilterGenRange range) => this.SetOption("range", range.GetEnumAttribute<NameAttribute>().Name);
         /// <summary>
-        ///  Output color primaries (from 0 to 22) (default 2)
+        ///  Output color primaries (from 0 to 256) (default 2)
         /// </summary>
         public ColorspaceFilterGen primaries(ColorspaceFilterGenPrimaries primaries) => this.SetOption("primaries", primaries.GetEnumAttribute<NameAttribute>().Name);
         /// <summary>
-        ///  Output transfer characteristics (from 0 to 18) (default 2)
+        ///  Output transfer characteristics (from 0 to 256) (default 2)
         /// </summary>
         public ColorspaceFilterGen trc(ColorspaceFilterGenTrc trc) => this.SetOption("trc", trc.GetEnumAttribute<NameAttribute>().Name);
         /// <summary>
@@ -47,6 +47,10 @@
         /// </summary>
         public ColorspaceFilterGen wpadapt(ColorspaceFilterGenWpadapt wpadapt) => this.SetOption("wpadapt", wpadapt.GetEnumAttribute<NameAttribute>().Name);
         /// <summary>
+        ///  Controls how to clip out-of-gamut colors that arise as a result of colorspace conversion. (from 0 to 1) (default none)
+        /// </summary>
+        public ColorspaceFilterGen clipgamut(ColorspaceFilterGenClipgamut clipgamut) => this.SetOption("clipgamut", clipgamut.GetEnumAttribute<NameAttribute>().Name);
+        /// <summary>
         ///  Set all input color properties together (from 0 to 8) (default 0)
         /// </summary>
         public ColorspaceFilterGen iall(ColorspaceFilterGenIall iall) => this.SetOption("iall", iall.GetEnumAttribute<NameAttribute>().Name);
@@ -59,11 +63,11 @@
         /// </summary>
         public ColorspaceFilterGen irange(ColorspaceFilterGenIrange irange) => this.SetOption("irange", irange.GetEnumAttribute<NameAttribute>().Name);
         /// <summary>
-        ///  Input color primaries (from 0 to 22) (default 2)
+        ///  Input color primaries (from 0 to 256) (default 2)
         /// </summary>
         public ColorspaceFilterGen iprimaries(ColorspaceFilterGenIprimaries iprimaries) => this.SetOption("iprimaries", iprimaries.GetEnumAttribute<NameAttribute>().Name);
         /// <summary>
-        ///  Input transfer characteristics (from 0 to 18) (default 2)
+        ///  Input transfer characteristics (from 0 to 256) (default 2)
         /// </summary>
         public ColorspaceFilterGen itrc(ColorspaceFilterGenItrc itrc) => this.SetOption("itrc", itrc.GetEnumAttribute<NameAttribute>().Name);
     }
@@ -195,7 +199,7 @@
     }
 
     /// <summary>
-    ///  Output color primaries (from 0 to 22) (default 2)
+    ///  Output color primaries (from 0 to 256) (default 2)
     /// </summary>
     public enum ColorspaceFilterGenPrimaries
     {
@@ -258,11 +262,16 @@
         /// ebu3213         22           ..FV.......
         /// </summary>
         [FFmpegArgs.Cores.Attributes.NameAttribute("ebu3213")]
-        ebu3213 = 22
+        ebu3213 = 22,
+        /// <summary>
+        /// vgamut          256          ..FV.......
+        /// </summary>
+        [FFmpegArgs.Cores.Attributes.NameAttribute("vgamut")]
+        vgamut = 256
     }
 
     /// <summary>
-    ///  Output transfer characteristics (from 0 to 18) (default 2)
+    ///  Output transfer characteristics (from 0 to 256) (default 2)
     /// </summary>
     public enum ColorspaceFilterGenTrc
     {
@@ -335,7 +344,12 @@
         /// bt2020-12       15           ..FV.......
         /// </summary>
         [FFmpegArgs.Cores.Attributes.NameAttribute("bt2020-12")]
-        bt2020_12 = 15
+        bt2020_12 = 15,
+        /// <summary>
+        /// vlog            256          ..FV.......
+        /// </summary>
+        [FFmpegArgs.Cores.Attributes.NameAttribute("vlog")]
+        vlog = 256
     }
 
     /// <summary>
@@ -427,6 +441,23 @@
         /// </summary>
         [FFmpegArgs.Cores.Attributes.NameAttribute("identity")]
         identity = 2
+    }
+
+    /// <summary>
+    ///  Controls how to clip out-of-gamut colors that arise as a result of colorspace conversion. (from 0 to 1) (default none)
+    /// </summary>
+    public enum ColorspaceFilterGenClipgamut
+    {
+        /// <summary>
+        /// none            0            ..FV.......
+        /// </summary>
+        [FFmpegArgs.Cores.Attributes.NameAttribute("none")]
+        none = 0,
+        /// <summary>
+        /// rgb             1            ..FV.......
+        /// </summary>
+        [FFmpegArgs.Cores.Attributes.NameAttribute("rgb")]
+        rgb = 1
     }
 
     /// <summary>
@@ -556,7 +587,7 @@
     }
 
     /// <summary>
-    ///  Input color primaries (from 0 to 22) (default 2)
+    ///  Input color primaries (from 0 to 256) (default 2)
     /// </summary>
     public enum ColorspaceFilterGenIprimaries
     {
@@ -619,11 +650,16 @@
         /// ebu3213         22           ..FV.......
         /// </summary>
         [FFmpegArgs.Cores.Attributes.NameAttribute("ebu3213")]
-        ebu3213 = 22
+        ebu3213 = 22,
+        /// <summary>
+        /// vgamut          256          ..FV.......
+        /// </summary>
+        [FFmpegArgs.Cores.Attributes.NameAttribute("vgamut")]
+        vgamut = 256
     }
 
     /// <summary>
-    ///  Input transfer characteristics (from 0 to 18) (default 2)
+    ///  Input transfer characteristics (from 0 to 256) (default 2)
     /// </summary>
     public enum ColorspaceFilterGenItrc
     {
@@ -696,7 +732,12 @@
         /// bt2020-12       15           ..FV.......
         /// </summary>
         [FFmpegArgs.Cores.Attributes.NameAttribute("bt2020-12")]
-        bt2020_12 = 15
+        bt2020_12 = 15,
+        /// <summary>
+        /// vlog            256          ..FV.......
+        /// </summary>
+        [FFmpegArgs.Cores.Attributes.NameAttribute("vlog")]
+        vlog = 256
     }
 
     public static partial class FilterGeneratedExtensions

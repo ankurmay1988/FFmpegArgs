@@ -1,9 +1,9 @@
 ﻿namespace FFmpegArgs.Filters.Generated
 {
     /// <summary>
-    /// .. blackframe        V-&gt;V       Detect frames that are (almost) black.
+    /// .S blackframe        V-&gt;V       Detect frames that are (almost) black.
     /// </summary>
-    public class BlackframeFilterGen : ImageToImageFilter
+    public class BlackframeFilterGen : ImageToImageFilter, ISliceThreading
     {
         internal BlackframeFilterGen(ImageMap input) : base("blackframe", input)
         {

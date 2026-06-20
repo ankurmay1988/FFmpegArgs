@@ -43,7 +43,7 @@
         /// </summary>
         public RubberbandFilterGen formant(RubberbandFilterGenFormant formant) => this.SetOption("formant", formant.GetEnumAttribute<NameAttribute>().Name);
         /// <summary>
-        ///  set pitch quality (from 0 to INT_MAX) (default speed)
+        ///  set pitch quality (from 0 to INT_MAX) (default quality)
         /// </summary>
         public RubberbandFilterGen pitchq(RubberbandFilterGenPitchq pitchq) => this.SetOption("pitchq", pitchq.GetEnumAttribute<NameAttribute>().Name);
         /// <summary>
@@ -170,20 +170,20 @@
     }
 
     /// <summary>
-    ///  set pitch quality (from 0 to INT_MAX) (default speed)
+    ///  set pitch quality (from 0 to INT_MAX) (default quality)
     /// </summary>
     public enum RubberbandFilterGenPitchq
     {
         /// <summary>
-        /// quality         33554432     ..F.A......
+        /// quality         0            ..F.A......
         /// </summary>
         [FFmpegArgs.Cores.Attributes.NameAttribute("quality")]
-        quality = 33554432,
+        quality = 0,
         /// <summary>
-        /// speed           0            ..F.A......
+        /// speed           33554432     ..F.A......
         /// </summary>
         [FFmpegArgs.Cores.Attributes.NameAttribute("speed")]
-        speed = 0,
+        speed = 33554432,
         /// <summary>
         /// consistency     67108864     ..F.A......
         /// </summary>

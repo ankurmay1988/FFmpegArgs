@@ -39,6 +39,10 @@
         /// </summary>
         public WhisperFilterGen format(String format) => this.SetOption("format", format.ToString());
         /// <summary>
+        ///  Max segment length in characters (from 0 to INT_MAX) (default 0)
+        /// </summary>
+        public WhisperFilterGen max_len(int max_len) => this.SetOptionRange("max_len", max_len, 0, INT_MAX);
+        /// <summary>
         ///  Path to the VAD model file
         /// </summary>
         public WhisperFilterGen vad_model(String vad_model) => this.SetOption("vad_model", vad_model.ToString());

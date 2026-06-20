@@ -1,7 +1,7 @@
 ﻿namespace FFmpegArgs.Filters.Generated
 {
     /// <summary>
-    /// .. acrossfade        AA-&gt;A      Cross fade two input audio streams.
+    /// .. acrossfade        N-&gt;A       Cross fade two input audio streams.
     /// </summary>
     public class AcrossfadeFilterGen : AudioToAudioFilter
     {
@@ -10,6 +10,14 @@
             AddMapOut();
         }
 
+        /// <summary>
+        ///  set number of input files to cross fade (from 1 to INT_MAX) (default 2)
+        /// </summary>
+        public AcrossfadeFilterGen inputs(int inputs) => this.SetOptionRange("inputs", inputs, 1, INT_MAX);
+        /// <summary>
+        ///  set number of input files to cross fade (from 1 to INT_MAX) (default 2)
+        /// </summary>
+        public AcrossfadeFilterGen n(int n) => this.SetOptionRange("n", n, 1, INT_MAX);
         /// <summary>
         ///  set number of samples for cross fade duration (from 1 to 2.14748e+08) (default 44100)
         /// </summary>
@@ -557,6 +565,6 @@
         /// <summary>
         /// Cross fade two input audio streams.
         /// </summary>
-        public static AcrossfadeFilterGen AcrossfadeFilterGen(this AudioMap input0, AudioMap input1) => new AcrossfadeFilterGen(input0, input1);
+        public static AcrossfadeFilterGen AcrossfadeFilterGen(this AudioMap input) => new AcrossfadeFilterGen(input);
     }
 }

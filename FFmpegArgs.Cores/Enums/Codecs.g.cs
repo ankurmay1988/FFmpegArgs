@@ -125,9 +125,9 @@
         [FFmpegArgs.Cores.Attributes.NameAttribute("aura2")]
         aura2,
         /// <summary>
-        /// Alliance for Open Media AV1 (decoders: libdav1d libaom-av1 av1 av1_cuvid av1_qsv av1_amf) (encoders: libaom-av1 librav1e libsvtav1 av1_nvenc av1_qsv av1_amf av1_mf av1_vaapi av1_vulkan)
+        /// Alliance for Open Media AV1 (decoders: libdav1d libaom-av1 av1 av1_cuvid av1_qsv av1_amf) (encoders: libaom-av1 librav1e libsvtav1 av1_d3d12va av1_nvenc av1_qsv av1_amf av1_mf av1_vaapi av1_vulkan)
         /// </summary>
-        [FFmpegArgs.Cores.Attributes.CodecFlagAttribute("DEV.L.")]
+        [FFmpegArgs.Cores.Attributes.CodecFlagAttribute("DEV.LS")]
         [FFmpegArgs.Cores.Attributes.NameAttribute("av1")]
         av1,
         /// <summary>
@@ -389,9 +389,9 @@
         [FFmpegArgs.Cores.Attributes.NameAttribute("escape130")]
         escape130,
         /// <summary>
-        /// MPEG-5 EVC (Essential Video Coding)
+        /// MPEG-5 EVC (Essential Video Coding) (encoders: libxeve)
         /// </summary>
-        [FFmpegArgs.Cores.Attributes.CodecFlagAttribute("..V.L.")]
+        [FFmpegArgs.Cores.Attributes.CodecFlagAttribute("DEV.L.")]
         [FFmpegArgs.Cores.Attributes.NameAttribute("evc")]
         evc,
         /// <summary>
@@ -515,7 +515,7 @@
         [FFmpegArgs.Cores.Attributes.NameAttribute("h263p")]
         h263p,
         /// <summary>
-        /// H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10 (decoders: h264 h264_qsv libopenh264 h264_amf h264_cuvid) (encoders: libx264 libx264rgb libopenh264 h264_amf h264_mf h264_nvenc h264_qsv h264_vaapi h264_vulkan)
+        /// H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10 (decoders: h264 h264_qsv h264_amf h264_cuvid) (encoders: libx264 libx264rgb h264_amf h264_d3d12va h264_mf h264_nvenc h264_qsv h264_vaapi h264_vulkan)
         /// </summary>
         [FFmpegArgs.Cores.Attributes.CodecFlagAttribute("DEV.LS")]
         [FFmpegArgs.Cores.Attributes.NameAttribute("h264")]
@@ -533,9 +533,9 @@
         [FFmpegArgs.Cores.Attributes.NameAttribute("hdr")]
         hdr,
         /// <summary>
-        /// H.265 / HEVC (High Efficiency Video Coding) (decoders: hevc hevc_qsv hevc_amf hevc_cuvid) (encoders: libx265 hevc_amf hevc_d3d12va hevc_mf hevc_nvenc hevc_qsv hevc_vaapi hevc_vulkan libkvazaar)
+        /// H.265 / HEVC (High Efficiency Video Coding) (decoders: hevc hevc_qsv hevc_amf hevc_cuvid) (encoders: libx265 hevc_amf hevc_d3d12va hevc_mf hevc_nvenc hevc_qsv hevc_vaapi hevc_vulkan)
         /// </summary>
-        [FFmpegArgs.Cores.Attributes.CodecFlagAttribute("DEV.L.")]
+        [FFmpegArgs.Cores.Attributes.CodecFlagAttribute("DEV.LS")]
         [FFmpegArgs.Cores.Attributes.NameAttribute("hevc")]
         hevc,
         /// <summary>
@@ -659,6 +659,12 @@
         [FFmpegArgs.Cores.Attributes.NameAttribute("jpegxl_anim")]
         jpegxl_anim,
         /// <summary>
+        /// JPEG XS (decoders: libsvtjpegxs) (encoders: libsvtjpegxs)
+        /// </summary>
+        [FFmpegArgs.Cores.Attributes.CodecFlagAttribute("DEVILS")]
+        [FFmpegArgs.Cores.Attributes.NameAttribute("jpegxs")]
+        jpegxs,
+        /// <summary>
         /// Bitmap Brothers JV video
         /// </summary>
         [FFmpegArgs.Cores.Attributes.CodecFlagAttribute("D.V.L.")]
@@ -682,6 +688,12 @@
         [FFmpegArgs.Cores.Attributes.CodecFlagAttribute("D.VI.S")]
         [FFmpegArgs.Cores.Attributes.NameAttribute("lagarith")]
         lagarith,
+        /// <summary>
+        /// LCEVC (Low Complexity Enhancement Video Coding) / MPEG-5 LCEVC / MPEG-5 part 2
+        /// </summary>
+        [FFmpegArgs.Cores.Attributes.CodecFlagAttribute("..V...")]
+        [FFmpegArgs.Cores.Attributes.NameAttribute("lcevc")]
+        lcevc,
         /// <summary>
         /// LEAD MCMP
         /// </summary>
@@ -1007,7 +1019,7 @@
         [FFmpegArgs.Cores.Attributes.NameAttribute("ppm")]
         ppm,
         /// <summary>
-        /// Apple ProRes (iCodec Pro) (encoders: prores prores_aw prores_ks)
+        /// Apple ProRes (iCodec Pro) (encoders: prores prores_aw prores_ks prores_ks_vulkan)
         /// </summary>
         [FFmpegArgs.Cores.Attributes.CodecFlagAttribute("DEVIL.")]
         [FFmpegArgs.Cores.Attributes.NameAttribute("prores")]
@@ -1763,6 +1775,12 @@
         [FFmpegArgs.Cores.Attributes.NameAttribute("adpcm_argo")]
         adpcm_argo,
         /// <summary>
+        /// ADPCM Circus
+        /// </summary>
+        [FFmpegArgs.Cores.Attributes.CodecFlagAttribute("D.AIL.")]
+        [FFmpegArgs.Cores.Attributes.NameAttribute("adpcm_circus")]
+        adpcm_circus,
+        /// <summary>
         /// ADPCM Creative Technology
         /// </summary>
         [FFmpegArgs.Cores.Attributes.CodecFlagAttribute("D.AIL.")]
@@ -1895,11 +1913,35 @@
         [FFmpegArgs.Cores.Attributes.NameAttribute("adpcm_ima_ea_sead")]
         adpcm_ima_ea_sead,
         /// <summary>
+        /// ADPCM IMA Acorn Escape
+        /// </summary>
+        [FFmpegArgs.Cores.Attributes.CodecFlagAttribute("D.AIL.")]
+        [FFmpegArgs.Cores.Attributes.NameAttribute("adpcm_ima_escape")]
+        adpcm_ima_escape,
+        /// <summary>
+        /// ADPCM IMA HVQM2
+        /// </summary>
+        [FFmpegArgs.Cores.Attributes.CodecFlagAttribute("D.A.L.")]
+        [FFmpegArgs.Cores.Attributes.NameAttribute("adpcm_ima_hvqm2")]
+        adpcm_ima_hvqm2,
+        /// <summary>
+        /// ADPCM IMA HVQM4
+        /// </summary>
+        [FFmpegArgs.Cores.Attributes.CodecFlagAttribute("D.AIL.")]
+        [FFmpegArgs.Cores.Attributes.NameAttribute("adpcm_ima_hvqm4")]
+        adpcm_ima_hvqm4,
+        /// <summary>
         /// ADPCM IMA Funcom ISS
         /// </summary>
         [FFmpegArgs.Cores.Attributes.CodecFlagAttribute("D.AIL.")]
         [FFmpegArgs.Cores.Attributes.NameAttribute("adpcm_ima_iss")]
         adpcm_ima_iss,
+        /// <summary>
+        /// ADPCM IMA Magix
+        /// </summary>
+        [FFmpegArgs.Cores.Attributes.CodecFlagAttribute("D.AIL.")]
+        [FFmpegArgs.Cores.Attributes.NameAttribute("adpcm_ima_magix")]
+        adpcm_ima_magix,
         /// <summary>
         /// ADPCM IMA MobiClip MOFLEX
         /// </summary>
@@ -1918,6 +1960,12 @@
         [FFmpegArgs.Cores.Attributes.CodecFlagAttribute("D.AIL.")]
         [FFmpegArgs.Cores.Attributes.NameAttribute("adpcm_ima_oki")]
         adpcm_ima_oki,
+        /// <summary>
+        /// ADPCM IMA PlayDate
+        /// </summary>
+        [FFmpegArgs.Cores.Attributes.CodecFlagAttribute("D.AIL.")]
+        [FFmpegArgs.Cores.Attributes.NameAttribute("adpcm_ima_pda")]
+        adpcm_ima_pda,
         /// <summary>
         /// ADPCM IMA QuickTime
         /// </summary>
@@ -1973,11 +2021,23 @@
         [FFmpegArgs.Cores.Attributes.NameAttribute("adpcm_mtaf")]
         adpcm_mtaf,
         /// <summary>
+        /// ADPCM Silicon Graphics N64
+        /// </summary>
+        [FFmpegArgs.Cores.Attributes.CodecFlagAttribute("D.AIL.")]
+        [FFmpegArgs.Cores.Attributes.NameAttribute("adpcm_n64")]
+        adpcm_n64,
+        /// <summary>
         /// ADPCM Playstation
         /// </summary>
         [FFmpegArgs.Cores.Attributes.CodecFlagAttribute("D.AIL.")]
         [FFmpegArgs.Cores.Attributes.NameAttribute("adpcm_psx")]
         adpcm_psx,
+        /// <summary>
+        /// ADPCM Playstation C
+        /// </summary>
+        [FFmpegArgs.Cores.Attributes.CodecFlagAttribute("D.AIL.")]
+        [FFmpegArgs.Cores.Attributes.NameAttribute("adpcm_psxc")]
+        adpcm_psxc,
         /// <summary>
         /// ADPCM Sanyo
         /// </summary>
@@ -2051,6 +2111,12 @@
         [FFmpegArgs.Cores.Attributes.NameAttribute("adpcm_zork")]
         adpcm_zork,
         /// <summary>
+        /// CRI AHX
+        /// </summary>
+        [FFmpegArgs.Cores.Attributes.CodecFlagAttribute("D.AIL.")]
+        [FFmpegArgs.Cores.Attributes.NameAttribute("ahx")]
+        ahx,
+        /// <summary>
         /// ALAC (Apple Lossless Audio Codec)
         /// </summary>
         [FFmpegArgs.Cores.Attributes.CodecFlagAttribute("DEAI.S")]
@@ -2063,9 +2129,9 @@
         [FFmpegArgs.Cores.Attributes.NameAttribute("amr_nb")]
         amr_nb,
         /// <summary>
-        /// AMR-WB (Adaptive Multi-Rate WideBand) (decoders: amrwb libopencore_amrwb)
+        /// AMR-WB (Adaptive Multi-Rate WideBand) (decoders: amrwb libopencore_amrwb) (encoders: libvo_amrwbenc)
         /// </summary>
-        [FFmpegArgs.Cores.Attributes.CodecFlagAttribute("D.AIL.")]
+        [FFmpegArgs.Cores.Attributes.CodecFlagAttribute("DEAIL.")]
         [FFmpegArgs.Cores.Attributes.NameAttribute("amr_wb")]
         amr_wb,
         /// <summary>
@@ -2177,9 +2243,9 @@
         [FFmpegArgs.Cores.Attributes.NameAttribute("celt")]
         celt,
         /// <summary>
-        /// codec2 (very low bitrate speech codec)
+        /// codec2 (very low bitrate speech codec) (decoders: libcodec2) (encoders: libcodec2)
         /// </summary>
-        [FFmpegArgs.Cores.Attributes.CodecFlagAttribute("..AIL.")]
+        [FFmpegArgs.Cores.Attributes.CodecFlagAttribute("DEAIL.")]
         [FFmpegArgs.Cores.Attributes.NameAttribute("codec2")]
         codec2,
         /// <summary>
@@ -2321,15 +2387,15 @@
         [FFmpegArgs.Cores.Attributes.NameAttribute("gremlin_dpcm")]
         gremlin_dpcm,
         /// <summary>
-        /// GSM
+        /// GSM (decoders: gsm libgsm) (encoders: libgsm)
         /// </summary>
-        [FFmpegArgs.Cores.Attributes.CodecFlagAttribute("D.AIL.")]
+        [FFmpegArgs.Cores.Attributes.CodecFlagAttribute("DEAIL.")]
         [FFmpegArgs.Cores.Attributes.NameAttribute("gsm")]
         gsm,
         /// <summary>
-        /// GSM Microsoft variant
+        /// GSM Microsoft variant (decoders: gsm_ms libgsm_ms) (encoders: libgsm_ms)
         /// </summary>
-        [FFmpegArgs.Cores.Attributes.CodecFlagAttribute("D.AIL.")]
+        [FFmpegArgs.Cores.Attributes.CodecFlagAttribute("DEAIL.")]
         [FFmpegArgs.Cores.Attributes.NameAttribute("gsm_ms")]
         gsm_ms,
         /// <summary>
@@ -2351,9 +2417,9 @@
         [FFmpegArgs.Cores.Attributes.NameAttribute("iac")]
         iac,
         /// <summary>
-        /// iLBC (Internet Low Bitrate Codec)
+        /// iLBC (Internet Low Bitrate Codec) (decoders: ilbc libilbc) (encoders: libilbc)
         /// </summary>
-        [FFmpegArgs.Cores.Attributes.CodecFlagAttribute("D.AIL.")]
+        [FFmpegArgs.Cores.Attributes.CodecFlagAttribute("DEAIL.")]
         [FFmpegArgs.Cores.Attributes.NameAttribute("ilbc")]
         ilbc,
         /// <summary>
@@ -2375,9 +2441,9 @@
         [FFmpegArgs.Cores.Attributes.NameAttribute("interplayacm")]
         interplayacm,
         /// <summary>
-        /// LC3 (Low Complexity Communication Codec)
+        /// LC3 (Low Complexity Communication Codec) (decoders: liblc3) (encoders: liblc3)
         /// </summary>
-        [FFmpegArgs.Cores.Attributes.CodecFlagAttribute("..AIL.")]
+        [FFmpegArgs.Cores.Attributes.CodecFlagAttribute("DEAIL.")]
         [FFmpegArgs.Cores.Attributes.NameAttribute("lc3")]
         lc3,
         /// <summary>
@@ -2423,7 +2489,7 @@
         [FFmpegArgs.Cores.Attributes.NameAttribute("mp2")]
         mp2,
         /// <summary>
-        /// MP3 (MPEG audio layer 3) (decoders: mp3float mp3) (encoders: libmp3lame mp3_mf)
+        /// MP3 (MPEG audio layer 3) (decoders: mp3float mp3) (encoders: libmp3lame libshine mp3_mf)
         /// </summary>
         [FFmpegArgs.Cores.Attributes.CodecFlagAttribute("DEAIL.")]
         [FFmpegArgs.Cores.Attributes.NameAttribute("mp3")]
@@ -2825,9 +2891,9 @@
         [FFmpegArgs.Cores.Attributes.NameAttribute("sonicls")]
         sonicls,
         /// <summary>
-        /// Speex
+        /// Speex (decoders: speex libspeex) (encoders: libspeex)
         /// </summary>
-        [FFmpegArgs.Cores.Attributes.CodecFlagAttribute("D.AIL.")]
+        [FFmpegArgs.Cores.Attributes.CodecFlagAttribute("DEAIL.")]
         [FFmpegArgs.Cores.Attributes.NameAttribute("speex")]
         speex,
         /// <summary>
@@ -2974,12 +3040,6 @@
         [FFmpegArgs.Cores.Attributes.CodecFlagAttribute("..D...")]
         [FFmpegArgs.Cores.Attributes.NameAttribute("klv")]
         klv,
-        /// <summary>
-        /// LCEVC (Low Complexity Enhancement Video Coding) / MPEG-5 LCEVC / MPEG-5 part 2
-        /// </summary>
-        [FFmpegArgs.Cores.Attributes.CodecFlagAttribute("..D...")]
-        [FFmpegArgs.Cores.Attributes.NameAttribute("lcevc")]
-        lcevc,
         /// <summary>
         /// raw MPEG-TS stream
         /// </summary>
