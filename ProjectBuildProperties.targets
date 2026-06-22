@@ -11,6 +11,21 @@
 		<NoWarn>$(NoWarn);CS1591</NoWarn>
 		<PathMap>$(MSBuildProjectDirectory)=$(MSBuildProjectName)</PathMap>
 
+		<!-- ===== Symbol / source cho "debug từ NuGet" =====
+		     DebugType=embedded + EmbedAllSources: nhúng PDB (kèm toàn bộ .cs nén) thẳng vào DLL
+		     → KHÔNG ship .pdb rời, người dùng step-into source offline mà không phải recompile.
+		     Lib công khai (MIT) nên chấp nhận source nằm trong dll. SourceLink là fallback kéo .cs từ GitHub.
+		     Vì pack bằng custom nuspec + dotnet pack nên KHÔNG sinh .snupkg được (SDK bỏ qua symbol pkg
+		     khi có NuspecFile); embedded là cách tương đương, tự chứa, verify được offline. -->
+		<DebugType>embedded</DebugType>
+		<EmbedAllSources>true</EmbedAllSources>
+		<Deterministic>true</Deterministic>
+		<IncludeSymbols>false</IncludeSymbols>
+		<PublishRepositoryUrl>true</PublishRepositoryUrl>
+		<EmbedUntrackedSources>true</EmbedUntrackedSources>
+		<!-- CI build mới bật để path/SourceLink deterministic; local giữ false để step-into source local -->
+		<ContinuousIntegrationBuild Condition="'$(ContinuousIntegrationBuild)' == '' and ('$(CI)' == 'true' or '$(GITHUB_ACTIONS)' == 'true')">true</ContinuousIntegrationBuild>
+
 		<!-- ===== Versioning bằng GitVersion =====
 		     Tag dạng vMAJOR.MINOR.0 (vd v2.2.0).
 		     AssemblyVersion     = Major.Minor.0.0   (cố định theo minor → không vỡ binding redirect)
@@ -24,6 +39,12 @@
 
 	<ItemGroup Condition="'$(EnableGitVersion)' == 'true'">
 		<PackageReference Include="GitVersion.MsBuild" Version="6.3.0" PrivateAssets="all" />
+	</ItemGroup>
+
+	<!-- SourceLink GitHub: nhúng URL raw.githubusercontent vào PDB (fallback khi không có source nhúng).
+	     PrivateAssets=all → chỉ dùng lúc build, không thành dependency của package. -->
+	<ItemGroup>
+		<PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="all" />
 	</ItemGroup>
 
 	<!-- Chạy SAU khi GitVersion tính xong (target GetVersion) -->
