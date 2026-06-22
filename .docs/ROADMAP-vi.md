@@ -44,10 +44,7 @@
 ## P2 — Mở rộng độ phủ (2.4)
 
 - [x] **Audio encoder wrappers** (đã làm): 8 lớp encoder trong [FFmpegArgs.Codec/Encoders/Audios/](../FFmpegArgs.Codec/Encoders/Audios/) — aac, libmp3lame, ac3, eac3, flac, alac, libopus, libvorbis (option lấy từ `ffmpeg -h encoder=<name>` thật, dump kèm comment). `libfdk_aac` không có trong build chuẩn (non-free) nên bỏ. 14 test arg-build trong [AudioEncoderTest.cs](../FFmpegArgs.Test/AudioEncoderTest.cs).
-- [x] **Demuxer/Muxer options** (đã làm — **đang tồn tại 2 hướng, cần hợp nhất**):
-  - (a) Extension generic [MuxerDemuxerOptionsExtension.cs](../FFmpegArgs.Extensions/MuxerDemuxerOptionsExtension.cs) (đợt P2): muxer `-movflags` (enum `MovFlag`); demuxer `-re`/`-start_number`/`-pattern_type` (image2) — gắn thẳng trên `BaseInput`/`BaseOutput`.
-  - (b) **Typed** (merge `features/mux-demux` vào `dev`): 2 project `FFmpegArgs.Inputs.Demuxers` / `FFmpegArgs.Outputs.Muxers` **đã QUAY LẠI solution** với kiến trúc typed — `BaseDemuxer` + 4 ImageDemuxer (Apng/Asf/Dash/Rawvideo) + `DemuxerExtensions`; `Outputs.Muxers` mới có `BaseMuxer` skeleton; interface `IDemux`/`IMux`/…
-  - → Hai hướng **trùng chức năng**. Kế hoạch hợp nhất xem mục **[Hợp nhất Demuxer/Muxer](#hợp-nhất-demuxermuxer-typed--extension)** bên dưới. concat/hls/dash sâu hơn: chưa.
+- [x] **Demuxer/Muxer options** (đã làm — **đã hợp nhất về typed API**): sau merge `features/mux-demux`, 2 hướng (extension generic + typed) đã được gom về một kiểu typed dùng closure `input.XxxDemux(d => …)` / `output.XxxMux(m => …)`. Chi tiết ở mục **[Hợp nhất Demuxer/Muxer](#hợp-nhất-demuxermuxer-typed--extension)** bên dưới. concat/hls/dash sâu hơn: chưa.
 - [x] **Subtitle** (đã làm, một phần): burn-in (`subtitles`/`ass` video filter) đã có sẵn; thêm `-c:s` (`Scodec`/`CopySubtitle`) + `-sub_charenc` trong [SubtitleAVStreamOptionsExtension.cs](../FFmpegArgs.Extensions/StreamSpecifiers/SubtitleAVStreamOptionsExtension.cs). Kiến trúc subtitle stream/map đầy đủ (mux subtitle stream như image/audio map): **HOÃN** (thay đổi kiến trúc lớn).
 - [ ] **Làm giàu filter generated** (**HOÃN** — chạy lại autogen sinh diff rất lớn, rủi ro khi không giám sát): nâng cấp [Autogens/Filter/FiltersGen.cs](../Autogens/Filter/FiltersGen.cs):
   - Hỗ trợ thêm loại bị bỏ qua (`N->N`, `|->N`) — xem danh sách `.other/NotAutoGen_window.txt`.
@@ -70,38 +67,27 @@
 
 ## Hợp nhất Demuxer/Muxer (typed ↔ extension)
 
-> Sau khi merge `features/mux-demux`, option demuxer/muxer tồn tại **2 hướng song song**. Mục tiêu: gom về **một** kiểu API typed, dùng coding style closure:
+> Sau khi merge `features/mux-demux`, option demuxer/muxer từng tồn tại **2 hướng song song**. **Đã hợp nhất** về một kiểu API typed dùng coding style closure:
 > ```csharp
-> imageFileInput.Image2Demux(d => d.StartNumber(5).PatternType(Image2PatternType.glob));
-> videoFileOutput.MovMux(m => m.MovFlags(MovFlag.faststart, MovFlag.empty_moov));
+> imageFileInput.Image2Demux(d => d.StartNumber(5).PatternType(Image2PatternType.glob)); // + -f image2
+> videoFileOutput.MovMux(m => m.MovFlags(MovFlag.faststart, MovFlag.empty_moov));         // + -f mov
+> videoFileOutput.Mp4Mux(m => m.MovFlags(MovFlag.faststart));                             // + -f mp4
 > ```
 
-### Hiện trạng 2 hướng
+### Đã thực hiện (✅)
 
-| Option | Hướng (a) generic — [MuxerDemuxerOptionsExtension.cs](../FFmpegArgs.Extensions/MuxerDemuxerOptionsExtension.cs) | Hướng (b) typed — [Demuxers](../FFmpegArgs.Inputs.Demuxers/)/[Muxers](../FFmpegArgs.Outputs.Muxers/) |
-|--------|----------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------|
-| image2 `-start_number`/`-pattern_type` | `input.StartNumber(5).PatternType(...)` trên mọi `BaseInput` | chưa có `Image2Demuxer` |
-| mov/mp4 `-movflags` | `output.MovFlags(...)` trên mọi `BaseOutput` | chưa có `MovMuxer` (mới `BaseMuxer` skeleton) |
-| `-re` | `input.Re()` trên mọi `BaseInput` | (không thuộc demuxer cụ thể) |
-| apng/asf/dash/rawvideo | — | đã có 4 `*Demuxer` typed |
+1. **Đặt tên**: extension method dùng hậu tố động từ `Demux`/`Mux`; **class** giữ danh từ `*Demuxer`/`*Muxer`. Đổi 4 extension cũ `Apng/Asf/Dash/RawvideoDemuxer` → `*Demux` (commit `caa296b`).
+2. **`Image2Demuxer`** (`-f image2`): `StartNumber`/`PatternType` + enum `Image2PatternType` chuyển vào typed class — [Image2Demuxer.cs](../FFmpegArgs.Inputs.Demuxers/ImageDemuxers/Image2Demuxer.cs) (commit `38444b1`).
+3. **`MovMuxer` (`-f mov`) + `Mp4Muxer` (`-f mp4`)** — **PA1**: 2 muxer typed riêng, share `-movflags` (enum `MovFlag`) qua [BaseMp4Muxer.cs](../FFmpegArgs.Outputs.Muxers/ImageMuxers/BaseMp4Muxer.cs); đây là muxer cụ thể **đầu tiên** (commit `98b823e`).
+4. **`-re` giữ generic**: dời `Re()` sang [InputOutputOptionsExtension.cs](../FFmpegArgs.Extensions/InputOutputOptionsExtension.cs) (option đọc input tốc độ gốc, áp cho mọi input).
+5. **Đã xóa** `MuxerDemuxerOptionsExtension.cs` + **sửa bug** namespace [BaseMuxer.cs](../FFmpegArgs.Outputs.Muxers/BaseMuxer.cs) → `FFmpegArgs.Outputs.Muxers` (commit `2a43305`, `b5a884b`).
+6. **Test**: [MuxerDemuxerOptionsTest.cs](../FFmpegArgs.Test/MuxerDemuxerOptionsTest.cs) viết lại theo API mới (Image2Demux/MovMux/Mp4Mux + `-re`) — **53/53 test pass**.
 
-**Cơ chế style closure** đã có sẵn ở overload thứ 2 của `DemuxerExtensions` (vd [RawvideoDemuxer.cs:35](../FFmpegArgs.Inputs.Demuxers/ImageDemuxers/RawvideoDemuxer.cs#L35)): `static TInput XxxDemuxer<TInput>(this TInput input, Action<XxxDemuxer> action)`. Việc cần làm chỉ là (1) **đổi tên** extension sang hậu tố `Demux`/`Mux`, (2) **chuyển** option generic vào typed class.
+> **Quyết định `-f` (PA1)**: mỗi muxer typed ép `-f` đúng họ container (`MovMux`→`-f mov`, `Mp4Mux`→`-f mp4`), nhất quán với ctor `BaseMuxer`/`BaseDemuxer` luôn set `-f`. Cả 2 hướng đều **chưa release** nên đổi/di chuyển API an toàn, không phá bản đã phát hành.
 
-### Kế hoạch (chưa code — chờ duyệt)
-
-1. **Quy ước đặt tên**: extension method dùng hậu tố động từ `Demux`/`Mux` (`input.Image2Demux(...)`, `output.MovMux(...)`); **class** giữ danh từ `*Demuxer`/`*Muxer`. → Đổi 4 extension hiện có `ApngDemuxer/AsfDemuxer/DashDemuxer/RawvideoDemuxer` → `ApngDemux/AsfDemux/DashDemux/RawvideoDemux` (giữ nguyên tên class).
-2. **Tạo `Image2Demuxer`** (`FFmpegArgs.Inputs.Demuxers`, format `image2`): chuyển `StartNumber`/`PatternType` + enum `Image2PatternType` vào đây. Extension `Image2Demux(this TInput, …)`.
-3. **Tạo `MovMuxer`** (`FFmpegArgs.Outputs.Muxers` — muxer cụ thể **đầu tiên**, format mov/mp4): chuyển `MovFlags` + enum `MovFlag` vào đây. Extension `MovMux(this TOutput, …)`.
-4. **Giữ `-re` ở dạng generic**: dời `Re()` sang [InputOutputOptionsExtension.cs](../FFmpegArgs.Extensions/) (là option đọc input tốc độ gốc, áp cho mọi input — KHÔNG nhét vào demuxer cụ thể).
-5. **Xóa** [MuxerDemuxerOptionsExtension.cs](../FFmpegArgs.Extensions/MuxerDemuxerOptionsExtension.cs) sau khi đã dời hết.
-6. **Sửa bug** namespace [BaseMuxer.cs:1](../FFmpegArgs.Outputs.Muxers/BaseMuxer.cs#L1): `FFmpegArgs.Inputs.Demuxers` → `FFmpegArgs.Outputs.Muxers`.
-7. **Test**: viết lại [MuxerDemuxerOptionsTest.cs](../FFmpegArgs.Test/MuxerDemuxerOptionsTest.cs) theo API mới + test build-args cho `Image2Demux`/`MovMux`.
-8. **Đóng gói**: cân nhắc thêm 2 project mới vào [NugetAll.ps1](../NugetAll.ps1) (quyết định khi release).
-
-### Điểm cần quyết trước khi code
-
-- **Ép `-f` hay không**: `BaseDemuxer`/`BaseMuxer` tự set `-f <format>` trong ctor. `Image2Demux` → thêm `-f image2` (hợp lý). Nhưng `MovMux` → thêm `-f mov`; với output `.mp4` có thể muốn `-f mp4` (hoặc không ép gì, để ffmpeg suy từ đuôi file). Cần chọn: ép `-f mov`, tách `Mp4Muxer`/`MovMuxer` riêng, hay cho `MovFlags` không kèm ép format.
-- **Breaking change**: cả 2 hướng đều **chưa release** (mới ở `dev`) → đổi tên/di chuyển API **an toàn**, không phá bản đã phát hành.
+### Còn lại
+- **Đóng gói**: cân nhắc thêm 2 project `FFmpegArgs.Inputs.Demuxers` / `FFmpegArgs.Outputs.Muxers` vào [NugetAll.ps1](../NugetAll.ps1) khi release.
+- Thêm demuxer/muxer khác theo cùng mẫu (audio demuxer/muxer, concat/hls/dash muxer…).
 
 ---
 
