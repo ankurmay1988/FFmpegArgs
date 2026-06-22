@@ -75,7 +75,7 @@ namespace FFmpegArgs.Filters.AudioFilters
         /// <param name="type"></param>
         /// <returns></returns>
         public AfadeFilter Type(AfadeType type)
-            => this.SetOption("t", type.ToString().ToLower());
+            => this.SetOption("t", type.GetEnumAttribute<NameAttribute>().Name);
         /// <summary>
         /// Specify the number of the start sample for starting to apply the fade effect. Default is 0.
         /// </summary>
@@ -138,11 +138,11 @@ namespace FFmpegArgs.Filters.AudioFilters
         /// <summary>
         /// fade-in
         /// </summary>
-        In,
+        [Name("in")] In,
         /// <summary>
         /// fade-out
         /// </summary>
-        Out
+        [Name("out")] Out
     }
     /// <summary>
     /// 

@@ -64,21 +64,21 @@ namespace FFmpegArgs.Filters.AudioFilters
         /// <param name="precision"></param>
         /// <returns></returns>
         public VolumeFilter Precision(VolumePrecision precision)
-          => this.SetOption("precision", precision.ToString().ToLower());
+          => this.SetOption("precision", precision.GetEnumAttribute<NameAttribute>().Name);
         /// <summary>
         /// Choose the behaviour on encountering ReplayGain side data in input frames.
         /// </summary>
         /// <param name="replayGain"></param>
         /// <returns></returns>
         public VolumeFilter ReplayGain(VolumeReplayGain replayGain)
-          => this.SetOption("replaygain", replayGain.ToString().ToLower());
+          => this.SetOption("replaygain", replayGain.GetEnumAttribute<NameAttribute>().Name);
         /// <summary>
         /// Set when the volume expression is evaluated.
         /// </summary>
         /// <param name="eval"></param>
         /// <returns></returns>
         public VolumeFilter Eval(VolumeEval eval)
-           => this.SetOption("eval", eval.ToString().ToLower());
+           => this.SetOption("eval", eval.GetEnumAttribute<NameAttribute>().Name);
         /// <summary>
         /// Pre-amplification gain in dB to apply to the selected replaygain gain.<br></br>
         /// Default value for replaygain_preamp is 0.0.<br>
@@ -127,11 +127,11 @@ namespace FFmpegArgs.Filters.AudioFilters
         /// <summary>
         /// only evaluate expression once during the filter initialization, or when the ‘volume’ command is sent
         /// </summary>
-        Once,
+        [Name("once")] Once,
         /// <summary>
         /// evaluate expression for each incoming frame
         /// </summary>
-        Frame
+        [Name("frame")] Frame
     }
     /// <summary>
     /// 
@@ -141,15 +141,15 @@ namespace FFmpegArgs.Filters.AudioFilters
         /// <summary>
         /// 8-bit fixed-point; this limits input sample format to U8, S16, and S32.
         /// </summary>
-        Fixed,
+        [Name("fixed")] Fixed,
         /// <summary>
         /// 32-bit floating-point; this limits input sample format to FLT. (default)
         /// </summary>
-        Float,
+        [Name("float")] Float,
         /// <summary>
         /// 64-bit floating-point; this limits input sample format to DBL.
         /// </summary>
-        Double
+        [Name("double")] Double
     }
     /// <summary>
     /// 
@@ -159,18 +159,18 @@ namespace FFmpegArgs.Filters.AudioFilters
         /// <summary>
         /// Remove ReplayGain side data, ignoring its contents (the default).
         /// </summary>
-        Drop,
+        [Name("drop")] Drop,
         /// <summary>
         /// Ignore ReplayGain side data, but leave it in the frame.
         /// </summary>
-        Ignore,
+        [Name("ignore")] Ignore,
         /// <summary>
         /// Prefer the track gain, if present.
         /// </summary>
-        Track,
+        [Name("track")] Track,
         /// <summary>
         /// Prefer the album gain, if present.
         /// </summary>
-        Album
+        [Name("album")] Album
     }
 }

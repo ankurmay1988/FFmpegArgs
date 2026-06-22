@@ -122,7 +122,7 @@ namespace FFmpegArgs.Filters.VideoFilters
         /// <param name="eval"></param>
         /// <returns></returns>
         public ScaleFilter Eval(ScaleEval eval)
-          => this.SetOption("eval", eval.ToString().ToLower());
+          => this.SetOption("eval", eval.GetEnumAttribute<NameAttribute>().Name);
         /// <summary>
         /// Set the interlacing mode
         /// </summary>
@@ -256,11 +256,11 @@ namespace FFmpegArgs.Filters.VideoFilters
         /// <summary>
         /// only evaluate expressions once during the filter initialization or when a command is processed
         /// </summary>
-        Init,
+        [Name("init")] Init,
         /// <summary>
         /// evaluate expressions for each incoming frame
         /// </summary>
-        Frame
+        [Name("frame")] Frame
     }
     public enum ScaleRange
     {

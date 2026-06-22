@@ -84,7 +84,7 @@ namespace FFmpegArgs.Filters.AudioFilters
         /// <param name="method"></param>
         /// <returns></returns>
         public AdeclickFilter Method(AdeclickMethod method)
-          => this.SetOption("m", method.ToString().ToLower());
+          => this.SetOption("m", method.GetEnumAttribute<NameAttribute>().Name);
     }
     /// <summary>
     /// 
@@ -106,10 +106,10 @@ namespace FFmpegArgs.Filters.AudioFilters
         /// <summary>
         /// Select overlap-add method. Even not interpolated samples are slightly changed with this method.
         /// </summary>
-        Add,
+        [Name("add")] Add,
         /// <summary>
         /// Select overlap-save method. Not interpolated samples remain unchanged.
         /// </summary>
-        Save
+        [Name("save")] Save
     }
 }

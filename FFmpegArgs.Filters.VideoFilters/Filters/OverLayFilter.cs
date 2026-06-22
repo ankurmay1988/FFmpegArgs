@@ -67,7 +67,7 @@ namespace FFmpegArgs.Filters.VideoFilters
         /// <param name="eval"></param>
         /// <returns></returns>
         public OverlayFilter Eval(OverlayEval eval)
-          => this.SetOption("eval", eval.ToString().ToLower());
+          => this.SetOption("eval", eval.GetEnumAttribute<NameAttribute>().Name);
         /// <summary>
         /// Set the format for the output video.
         /// </summary>
@@ -81,7 +81,7 @@ namespace FFmpegArgs.Filters.VideoFilters
         /// <param name="alpha"></param>
         /// <returns></returns>
         public OverlayFilter Alpha(OverlayAlpha alpha)
-          => this.SetOption("alpha", alpha.ToString().ToLower());
+          => this.SetOption("alpha", alpha.GetEnumAttribute<NameAttribute>().Name);
     }
     /// <summary>
     /// 
@@ -111,8 +111,8 @@ namespace FFmpegArgs.Filters.VideoFilters
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
     public enum OverlayAlpha
     {
-        Straight,
-        Premultiplied
+        [Name("straight")] Straight,
+        [Name("premultiplied")] Premultiplied
     }
     public enum OverlayPixFmt
     {
@@ -157,11 +157,11 @@ namespace FFmpegArgs.Filters.VideoFilters
         /// <summary>
         /// only evaluate expressions once during the filter initialization or when a command is processed
         /// </summary>
-        Init,
+        [Name("init")] Init,
         /// <summary>
         /// evaluate expressions for each incoming frame
         /// </summary>
-        Frame
+        [Name("frame")] Frame
     }
 #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
 }
