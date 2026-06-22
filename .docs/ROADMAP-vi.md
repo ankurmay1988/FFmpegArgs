@@ -50,7 +50,7 @@
   - Hỗ trợ thêm loại bị bỏ qua (`N->N`, `|->N`) — xem danh sách `.other/NotAutoGen_window.txt`.
   - Tự gắn `ITimelineSupport`/`ICommandSupport`/`ISliceThreading` theo cờ `T/S/C` từ `ffmpeg -filters`.
   - Nhận diện tham số kiểu expression để dùng `ExpressionValue` thay vì string.
-- [ ] **Đồng bộ ffmpeg version** (**HOÃN** — cần regen + diff lớn, làm khi có giám sát): cập nhật bản dump trong [.other/](../.other/) lên ffmpeg mới, chạy lại [Autogens](../Autogens/Program.cs), ghi chú ffmpeg version tối thiểu được hỗ trợ.
+- [x] **Đồng bộ ffmpeg version** (đã làm — lên **n8.0.1**): cập nhật 4 dump trong [.other/](../.other/) sang `ffmpeg n8.0.1-48-g0592be14ff` (build 20260202) + chạy lại [Autogens](../Autogens/Program.cs) (LIVE từ ffmpeg trên PATH, CWD = gốc repo). Diff thực tế **rất nhỏ** vì code generated vốn đã ở 8.0.x: **0 enum đổi** (codec/format giống), chỉ **2 filter `.g.cs`** sửa mojibake µ/° → `&#181;`/`&#176;`. **Version sinh/test: ffmpeg n8.0.1** (khuyến nghị dùng ffmpeg ≥ 8.0). 53/53 test pass. *(Lưu ý: delete-loop ở [FiltersGen.cs:39-42](../Autogens/Filter/FiltersGen.cs#L39-L42) vẫn comment → filter bị gỡ ở bản mới sẽ để lại `.g.cs` cũ; lần này không có filter nào bị gỡ.)*
 
 ---
 
