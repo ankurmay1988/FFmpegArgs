@@ -4,6 +4,7 @@ The standout feature that many cli-wrapper libraries don't have is the **FFmpeg 
 
 Get it on [NuGet Package](https://www.nuget.org/packages?q=FFmpegArgs)  
 📖 Examples grouped by feature: [.docs/EXAMPLES.md](.docs/EXAMPLES.md)  
+📝 Commit message rules (English, Conventional Commits): [.docs/COMMIT_CONVENTION.md](.docs/COMMIT_CONVENTION.md)  
 ________________________________________  
 - Support file/url/pipe in/output.
 - Works on most systems - if ffmpeg can execution.
@@ -76,7 +77,8 @@ We can extend for `FFmpegArg`, `Filter`, `Input`, `Output`, `AVStream` by extens
 
 We can write new Filter class, so much example in `FFmpegArgs.Filters`  
 
-Pull request or request missing feature are welcome.
+Pull request or request missing feature are welcome.  
+Please write commit messages in **English** following the [commit convention](.docs/COMMIT_CONVENTION.md).
 
 ----------------------------------------
 For non-English locales. Please swap to English before using FFmpegArgs  
