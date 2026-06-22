@@ -50,7 +50,8 @@ File giải pháp: [FFmpegArgs.sln](../FFmpegArgs.sln)
 | | `.Filters.Generated` (470) | Filter **auto-generate** từ `ffmpeg -filters`/`-h full`. |
 | **ffplay** | `FFplayArgs` | Wrapper `ffplay` — **sơ khai** (chỉ sinh args, chưa có execute). |
 | **Công cụ** | `Autogens` | Console app (net8.0) sinh code: filter `.g.cs`, enum Codecs/Demuxer/Muxer. |
-| **Test** | `FFmpegArgs.Test` | MSTest (net8.0) — 23 file test, 50 `[TestMethod]`. |
+| **Test** | `FFmpegArgs.Test` | MSTest (net8.0) — **không cần ffmpeg**, chỉ dựng & kiểm tra chuỗi argument. Chạy trên CI. |
+| | `FFmpegArgs.Test.Render` | MSTest (net8.0) — **cần ffmpeg + media** (Pipe, AVStreamOption, DrawText, slideshow). Không chạy CI; define `Render` ở Debug để thực thi ffmpeg. |
 
 ---
 
@@ -168,7 +169,10 @@ Mỗi encoder phơi bày enum preset/tune/profile/rate-control... dưới dạng
   - [NugetAll.ps1](../NugetAll.ps1) → lặp ~17 project, gọi [FunctionModule.psm1](../FunctionModule.psm1) (`NugetPack`/`NugetPush`); [BuildSingle.psm1](../BuildSingle.psm1) build một project. Cả hai **chỉ chạy ở branch `master`** (`Assert-MasterBranch`).
   - **Version sinh tự động bằng GitVersion** ([GitVersion.yml](../GitVersion.yml), `mode: ManualDeployment`, tag-prefix `v`, master `increment: None`): tag `vMAJOR.MINOR.0` → `PackageVersion = Major.Minor.<số commit kể từ tag>` (vd HEAD hiện tại = `2.2.6`). `AssemblyVersion = Major.Minor.0.0`. Cấu hình tại target `SetVersionFromGitVersion` trong [ProjectBuildProperties.targets](../ProjectBuildProperties.targets); nuspec dùng token `$version$`/`$id$`. Package phụ thuộc khóa khoảng `[2.2,2.3)`.
   - Đóng gói kèm `.dll/.pdb/.xml` + README; **chưa** có symbol package `.snupkg`.
-- **Test** ([FFmpegArgs.Test/](../FFmpegArgs.Test/)): MSTest, gồm unit build-args ([BuildTest/](../FFmpegArgs.Test/BuildTest/)), feature ([FeatureTest/](../FFmpegArgs.Test/FeatureTest/): Expression, Pipe, Rational), và **integration** chạy ffmpeg thật ([FiltersTest/](../FFmpegArgs.Test/FiltersTest/), slideshow). Cần `ffmpeg` trong PATH + media mẫu.
+- **Test** (2 project, MSTest net8.0):
+  - [FFmpegArgs.Test/](../FFmpegArgs.Test/) — **không phụ thuộc ffmpeg**, chỉ dựng & kiểm tra chuỗi argument (build-args [BuildTest/](../FFmpegArgs.Test/BuildTest/), feature [FeatureTest/](../FFmpegArgs.Test/FeatureTest/): Expression/Rational, codec, render-progress, escaping...). Chạy được trên CI, không cần `ffmpeg`/media.
+  - [FFmpegArgs.Test.Render/](../FFmpegArgs.Test.Render/) — **integration cần ffmpeg + media** (`PipeTest`, `AVStreamOptionTest`, `DrawTextTest`, [TanersenerSlideShow/](../FFmpegArgs.Test.Render/TanersenerSlideShow/) + [Resources/](../FFmpegArgs.Test.Render/Resources/)). Define `Render` ở Debug để thực thi ffmpeg; không chạy trên CI.
+- **CI** ([.github/workflows/ci.yml](../.github/workflows/ci.yml)): build + chạy `FFmpegArgs.Test` trên `ubuntu-latest` (.NET 8), `-p:EnableGitVersion=false`.
 - **Quy ước code** [.editorconfig](../.editorconfig): C# 12, PascalCase, interface prefix `I`, namespace block-scoped, CRLF, indent 4.
 
 ---
@@ -184,6 +188,6 @@ Mỗi encoder phơi bày enum preset/tune/profile/rate-control... dưới dạng
 | 5 | `Inputs.Demuxers` / `Outputs.Muxers` trống (chưa có option class đặc thù) | Khung rỗng | — |
 | 6 | Filter generated thiếu expression/timeline/validate; loại `N->N`, `|->N` bị bỏ qua | Hạn chế độ phủ | `.other/NotAutoGen_window.txt` |
 | 7 | Escaping Lv3 (mức argument) chưa làm | Bỏ ngỏ | [FilterExtensions.cs](../FFmpegArgs.Cores/Extensions/FilterExtensions.cs) |
-| 8 | Test phụ thuộc nhiều vào ffmpeg thật + media cục bộ | Khó CI | [FFmpegArgs.Test/](../FFmpegArgs.Test/) |
+| 8 | ~~Test phụ thuộc nhiều vào ffmpeg thật + media cục bộ~~ | **Đã xử lý**: tách [FFmpegArgs.Test/](../FFmpegArgs.Test/) (no-ffmpeg, CI) và [FFmpegArgs.Test.Render/](../FFmpegArgs.Test.Render/) (cần ffmpeg) | [ci.yml](../.github/workflows/ci.yml) |
 
 > Kế hoạch xử lý các mục này nằm ở [ROADMAP-vi.md](ROADMAP-vi.md).

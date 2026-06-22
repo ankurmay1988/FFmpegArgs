@@ -49,8 +49,8 @@
 
 ## P3 — Chất lượng & hạ tầng (2.4–2.5)
 
-- [ ] **Tách unit test khỏi ffmpeg thật**: phần lớn test trong [FFmpegArgs.Test/](../FFmpegArgs.Test/) cần ffmpeg + media cục bộ. Bổ sung tầng test "chỉ so khớp chuỗi argument" (không chạy process) để chạy được trên CI; đánh dấu `[TestCategory("Integration")]` cho test cần ffmpeg.
-- [ ] **CI/CD GitHub Actions**: build matrix (netstandard2.0/net6/net8), chạy unit test, (tùy chọn) cài ffmpeg để chạy integration, tự đóng gói & publish NuGet khi tag. Thay thế quy trình thủ công [NugetAll.ps1](../NugetAll.ps1).
+- [x] **Tách unit test khỏi ffmpeg thật** (đã làm): tách thành 2 project — [FFmpegArgs.Test/](../FFmpegArgs.Test/) chỉ dựng & kiểm tra chuỗi argument (không chạy ffmpeg, chạy được trên CI) và [FFmpegArgs.Test.Render/](../FFmpegArgs.Test.Render/) gồm các test cần ffmpeg + media (`PipeTest`, `AVStreamOptionTest`, `DrawTextTest`, `TanersenerSlideShow`). Bỏ define `Render` ở project không-ffmpeg.
+- [x] **CI/CD GitHub Actions** (đã làm — phần không-ffmpeg): [.github/workflows/ci.yml](../.github/workflows/ci.yml) build + chạy unit test của `FFmpegArgs.Test` trên `ubuntu-latest` (.NET 8), dùng `-p:EnableGitVersion=false`. Còn lại: matrix đa target, job tùy chọn cài ffmpeg chạy `FFmpegArgs.Test.Render`, và tự đóng gói & publish NuGet khi tag (thay [NugetAll.ps1](../NugetAll.ps1)).
 - [ ] **Symbol package**: phát hành `.snupkg` (Source Link) thay vì nhúng `.pdb`, để debug từ NuGet.
 - [x] **Versioning tự động** (đã làm): GitVersion ([GitVersion.yml](../GitVersion.yml)) thay `FileVersion` thủ công + biến `$build`. Tag `vM.m.0` → package `M.m.<commits>`; script pack chỉ chạy ở `master`. Còn lại: cân nhắc tích hợp vào CI.
 - [ ] **Tài liệu**: trang ví dụ theo nhóm tính năng (filter graph, pipe, codec phần cứng, progress) dựa trên [README.MD](../README.MD); cân nhắc DocFX trang API.
