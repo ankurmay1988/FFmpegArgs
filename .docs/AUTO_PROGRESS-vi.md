@@ -59,7 +59,14 @@
 - Test arg-build trong `FFmpegArgs.Test` (thêm ProjectReference `FFprobeArgs`) — assert token-list các case đại diện. KHÔNG cần ffmpeg.
 - Gate: solution build + 53 test cũ pass + test mới pass. Commit `feat(ffprobe): ...`.
 
-### T2 — P2: Làm giàu filter generated  · trạng thái: ⬜ (RỦI RO CAO — chia sub-step, mỗi step 1 commit, mỗi step build+test xanh)
+### T2 — P2: Làm giàu filter generated  · trạng thái: ✅ ĐÃ ĐIỀU TRA, không thay đổi code (kết quả đúng đắn)
+> **Kết luận điều tra (subagent a42b10ea):** baseline regen 8.0.1 = **0 diff** (generated code đã đồng bộ).
+> - **T2a — đóng, BẤT KHẢ THI:** ffmpeg 8.0.1 `-filters` chỉ có **2 cột cờ (T, S)**, KHÔNG có cột Command-support `C` (561/561 dòng khớp `^ [TS.]{2} `, 0 dòng 3 cờ). Interface `ICommandSupport` đã tồn tại tại `FFmpegArgs.Filters\Interfaces\ICommandSupport.cs` nhưng không có dữ liệu để gắn. → Không sửa regex/GetFilterInterface.
+> - **T2c — đóng, ĐÃ LÀM:** `FilterFunctionGen.cs:321-332` đã emit `ExpressionValue` khi mô tả chứa "expression" hoặc tên param kết thúc "expr". ffmpeg không có bit máy-đọc cho expression (cột 11 cờ EDFVASXRBTP: `T`=RUNTIME_PARAM ≠ expression) → heuristic hiện tại là tốt nhất khả dĩ.
+> - **T2b — HOÃN ⏭️ (architectural):** dynamic `N→N`/`|→N` cần base class mới; rủi ro cao, để làm có giám sát. Đây là phần "làm giàu" thực chất còn lại duy nhất.
+
+<!-- spec gốc giữ lại bên dưới để tham khảo -->
+#### (spec gốc T2)
 > Nâng cấp [Autogens/Filter/FiltersGen.cs](../Autogens/Filter/FiltersGen.cs). **Điều tra trước khi đổi**: đọc dump `.other/ffmpeg filters ... n8.0.1 ...txt` để xác nhận format cờ thực tế (phiên trước thấy regex 2-cờ `^([TS.]{2})` match đúng với 8.0.1; xác minh lại trước khi sửa).
 - **T2a** Cờ Command support `C` → `ICommandSupport`: hiện `GetFilterInterface` (FiltersGen.cs:~349-354) đã gắn `T`→`ITimelineSupport`, `S`→`ISliceThreading`; dòng `C`→`ICommandSupport` đang comment vì regex chỉ bắt 2 ký tự (`support[2]` out-of-range). Nếu dump có cờ thứ 3 → mở rộng `regex_filter` bắt cờ thứ 3, bật `ICommandSupport`. **Xác minh interface `ICommandSupport` tồn tại** (FFmpegArgs.Cores.Interfaces) trước khi dùng; chưa có thì tạo theo mẫu `ITimelineSupport`/`ISliceThreading`.
 - **T2b** Hỗ trợ loại đang bỏ qua `N->N`, `|->N` (xem `.other/NotAutoGen_*.txt`). Cần base filter cho dynamic N in/out → **độ phức tạp cao**; nếu rủi ro lớn thì `⏭️ defer` và ghi rõ lý do, KHÔNG cố ép.
@@ -67,14 +74,15 @@
 - Regen: prepend PATH 8.0.1 (§1) → `dotnet run --project Autogens ...` → ghi số `.g.cs` đổi (HR10) → build solution + 53 test → commit `feat(autogen): ...` (gộp đổi generator + output regen của cùng sub-step).
 - Lưu ý: delete-loop [FiltersGen.cs:39-42](../Autogens/Filter/FiltersGen.cs#L39-L42) đang comment → filter bị gỡ sẽ để lại `.g.cs` cũ (không bật lại khi không giám sát).
 
-### T3 — P4 còn lại (chỉ làm nếu còn thời gian/token, mỗi mục 1 task riêng, ưu tiên rủi ro thấp)  · trạng thái: ⬜
-- Validate đồ thị mạnh hơn (additive) → ưu tiên.
-- `-hwaccel`/`hwupload`/`hwdownload`/`-init_hw_device` (additive extension).
-- Autogen → Roslyn Source Generator (lớn, kiến trúc).
-- AOT/trim friendly (annotation).
-- API streaming nâng cao.
+### T3 — P4 còn lại (mỗi mục 1 task riêng, ưu tiên rủi ro thấp trước)
+- **T3a** `-hwaccel`/`-hwaccel_device`/`-hwaccel_output_format`/`-init_hw_device`/`-filter_hw_device` (additive extension input+global). Điều tra (không trùng) filter `hwupload`/`hwdownload` đã auto-gen. Test arg-build. **AN TOÀN — ưu tiên.** · trạng thái: 🔄
+- **T3b** Validate đồ thị mạnh hơn (map dùng 2 lần, lệch kiểu, sink/source). **RỦI RO TRUNG BÌNH** (đụng core BaseFilter/FilterChain/map — có thể đổi hành vi throw). Chỉ làm kiểu **opt-in additive**, KHÔNG đổi throw hiện có; nếu phải đổi core → ⏭️ defer cho có giám sát. · trạng thái: ⬜
+- **T3c** Autogen → Roslyn Source Generator. **⏭️ DEFER** (đại tu kiến trúc, cần giám sát). · trạng thái: ⏭️
+- **T3d** AOT/trim friendly. **⏭️ DEFER** (cross-cutting, cần phân tích reflection toàn repo). · trạng thái: ⏭️
+- **T3e** API streaming nâng cao (RTMP/SRT/HLS helper). **⏭️ DEFER** (design-heavy). · trạng thái: ⏭️
 
 ## 5. Nhật ký iteration (append-only, mới nhất ở trên)
 
+- `T2 ✅ (no-op)` — Điều tra "làm giàu filter". Baseline regen 8.0.1 = 0 diff. T2a bất khả thi (8.0.1 `-filters` không còn cột cờ `C`), T2c đã làm sẵn (ExpressionValue heuristic), T2b hoãn (architectural). KHÔNG sửa code — đúng directive "không thay đổi cũng chấp nhận được". Tree sạch tại `4a8b177`. T3: tách rủi ro → T3a hwaccel (làm), T3b validate (opt-in/defer), T3c/d/e defer. Tiếp theo: T3a.
 - `T1 ✅` — ffprobe wrapper. Tạo project `FFprobeArgs` self-contained (FFprobeArg token-list + FFprobePrintFormat + FFprobeRender/Config/Result/Extensions + model JSON tối thiểu), đăng ký vào `FFmpegArgs.sln` (GUID mới), thêm ProjectReference + `FFprobeArgTest.cs` (9 test) vào `FFmpegArgs.Test`. Build solution 0 error; **62/62 test pass** (53 baseline + 9). Commit `deefb99` (14 files). FFprobeRender ĐÃ gồm (parse JSON qua System.Text.Json, netstandard2.0 thêm package có điều kiện). Chưa thêm execute-test vào `FFmpegArgs.Test.Render` (follow-up tuỳ chọn). Tiếp theo: T2 (làm giàu filter).
 - `INIT` — Tạo branch `auto/overnight-roadmap` từ `dev` (đỉnh `e4f2637`). Viết tracker này. Baseline: FFmpegArgs.Test 53/53. Tiếp theo: T1 (ffprobe).
