@@ -94,7 +94,7 @@ namespace FFmpegArgs.Filters.AudioFilters
         /// </summary>
         /// <param name="timing"></param>
         /// <returns></returns>
-        public ApulsatorFilter Timing(ApulsatorMode timing)
+        public ApulsatorFilter Timing(ApulsatorTiming timing)
             => this.SetOption("timing", timing.GetEnumAttribute<NameAttribute>().Name);
 
         /// <summary>
@@ -166,16 +166,16 @@ namespace FFmpegArgs.Filters.AudioFilters
     public enum ApulsatorTiming
     {
         /// <summary>
-        /// 
+        ///
         /// </summary>
-        Bpm = 0,
+        [Name("bpm")] Bpm = 0,
         /// <summary>
-        /// 
+        ///
         /// </summary>
-        Ms = 1,
+        [Name("ms")] Ms = 1,
         /// <summary>
-        /// 
+        ///
         /// </summary>
-        Hz = 2
+        [Name("hz")] Hz = 2
     }
 }
