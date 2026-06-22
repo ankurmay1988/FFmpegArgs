@@ -22,5 +22,18 @@
                     .MapOut;
             //ffplayArg.TestRender(filterFileName, outputFileName);
         }
+
+        [TestMethod]
+        public void TestFilterComplexScriptArgHasLeadingDash()
+        {
+            // Chong tai phat bug: GetFullCommandlineWithFilterScript tung dung
+            // "filter_complex_script" thieu dau '-' (phai la "-filter_complex_script",
+            // dong bo voi FFmpegArg).
+            FFplayArg ffplayArg = new FFplayArg();
+            var args = ffplayArg.GetFullCommandlineWithFilterScript("filter.txt").ToList();
+
+            Assert.IsTrue(args.Contains("-filter_complex_script"), "phai dung '-filter_complex_script'");
+            Assert.IsFalse(args.Contains("filter_complex_script"), "khong duoc dung 'filter_complex_script' thieu dau '-'");
+        }
     }
 }

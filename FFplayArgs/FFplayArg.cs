@@ -149,7 +149,7 @@
             [
                 .. GetGlobalArgs(),
                 .. GetInputsArgs(),
-                "filter_complex_script",
+                "-filter_complex_script",
                 script_name_or_path,
             ];
             return args;
