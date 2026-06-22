@@ -44,7 +44,7 @@ File giải pháp: [FFmpegArgs.sln](../FFmpegArgs.sln)
 | | `.Filters.AudioFilters` (97) | Filter audio viết tay. |
 | | `.Filters.VideoSources` (24) / `.AudioSources` (9) / `.MultimediaSources` (2) | Source filter (sinh khung hình/âm thanh: testsrc, color, sine...). |
 | | `.Filters.Multimedia` (7) | Filter đa phương tiện (concat, split, select...). |
-| | `.Filters.VideoSinks` (2) / `.AudioSinks` (2) | Sink filter — **đang để comment, chưa hoàn thiện**. |
+| | `.Filters.VideoSinks` (2) / `.AudioSinks` (2) | Sink filter (`V/A->|`) — **đã hoàn thiện**: buffersink/nullsink, abuffersink/anullsink. |
 | | `.Filters.OpenCLVideoFilters` (17) | Filter tăng tốc OpenCL. |
 | | `.Filters.VAAPIVideoFilters` (1) | Filter VAAPI. |
 | | `.Filters.Generated` (470) | Filter **auto-generate** từ `ffmpeg -filters`/`-h full`. |
@@ -181,13 +181,13 @@ Mỗi encoder phơi bày enum preset/tune/profile/rate-control... dưới dạng
 
 | # | Hạng mục | Trạng thái | Vị trí |
 |---|----------|-----------|--------|
-| 1 | `FFplayArg.GetFullCommandlineWithFilterScript` dùng `"filter_complex_script"` **thiếu dấu `-`** | Bug | [FFplayArg.cs:152](../FFplayArgs/FFplayArg.cs#L152) (so với [FFmpegArg.cs:226](../FFmpegArgs/FFmpegArg.cs#L226)) |
-| 2 | Video/Audio **Sinks** comment toàn bộ | Chưa hoàn thiện | [BuffersinkFilter.cs](../FFmpegArgs.Filters.VideoSinks/Filters/BuffersinkFilter.cs) |
+| 1 | ~~`FFplayArg.GetFullCommandlineWithFilterScript` dùng `"filter_complex_script"` **thiếu dấu `-`**~~ | **Đã sửa**: thêm `-` + test chống tái phát | [FFplayArg.cs:152](../FFplayArgs/FFplayArg.cs#L152), [FFplayArgTest.cs](../FFmpegArgs.Test/FFplayArgTest.cs) |
+| 2 | ~~Video/Audio **Sinks** comment toàn bộ~~ | **Đã làm**: `AllowNoMapOut` + base sink + 4 sink filter + test | [SinkFilterTest.cs](../FFmpegArgs.Test/SinkFilterTest.cs) |
 | 3 | `FilterStringInput` (lavfi) comment toàn bộ | Chưa hoàn thiện | [FilterStringInput.cs](../FFmpegArgs.Inputs/FilterStringInput.cs) |
 | 4 | `FFplayArgs` không có lớp execute (chỉ sinh args) | Sơ khai | [FFplayArgs/](../FFplayArgs/) |
 | 5 | `Inputs.Demuxers` / `Outputs.Muxers` trống (chưa có option class đặc thù) | Khung rỗng | — |
 | 6 | Filter generated thiếu expression/timeline/validate; loại `N->N`, `|->N` bị bỏ qua | Hạn chế độ phủ | `.other/NotAutoGen_window.txt` |
-| 7 | Escaping Lv3 (mức argument) chưa làm | Bỏ ngỏ | [FilterExtensions.cs](../FFmpegArgs.Cores/Extensions/FilterExtensions.cs) |
+| 7 | Escaping Lv3 (mức process arg/shell) | **Giữ stub** (không cần do thực thi qua `ArgumentList`, không qua shell) | [FilterExtensions.cs](../FFmpegArgs.Cores/Extensions/FilterExtensions.cs) |
 | 8 | ~~Test phụ thuộc nhiều vào ffmpeg thật + media cục bộ~~ | **Đã xử lý**: tách [FFmpegArgs.Test/](../FFmpegArgs.Test/) (no-ffmpeg, CI) và [FFmpegArgs.Test.Render/](../FFmpegArgs.Test.Render/) (cần ffmpeg) | [ci.yml](../.github/workflows/ci.yml) |
 
 > Kế hoạch xử lý các mục này nằm ở [ROADMAP-vi.md](ROADMAP-vi.md).
