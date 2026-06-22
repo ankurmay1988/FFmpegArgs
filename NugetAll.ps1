@@ -1,4 +1,7 @@
-Import-Module .\FunctionModule.psm1
+Import-Module .\FunctionModule.psm1 -Force
+
+# NuGet pack/push is only allowed on the 'master' branch.
+if (-not (Assert-MasterBranch)) { pause; return }
 
 $names= @(
     "FFmpegArgs",
