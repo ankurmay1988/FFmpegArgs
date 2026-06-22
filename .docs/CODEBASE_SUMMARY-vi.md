@@ -25,7 +25,7 @@ Cấu hình chung tại [ProjectBuildProperties.targets](../ProjectBuildProperti
 
 ---
 
-## 2. Bản đồ Solution (21 project)
+## 2. Bản đồ Solution (25 project code)
 
 File giải pháp: [FFmpegArgs.sln](../FFmpegArgs.sln)
 
@@ -36,7 +36,8 @@ File giải pháp: [FFmpegArgs.sln](../FFmpegArgs.sln)
 | | `FFmpegArgs.Extensions` | Extension method fluent cho global/input/output/per-stream options. |
 | **I/O** | `FFmpegArgs.Inputs` | Các loại input cụ thể (File/Url/Pipe/Concat cho Video/Audio/Image). |
 | | `FFmpegArgs.Outputs` | Các loại output cụ thể. |
-| | `FFmpegArgs.Inputs.Demuxers` / `.Outputs.Muxers` | (Khung) cho option đặc thù demuxer/muxer — **hiện trống**. |
+| | `FFmpegArgs.Inputs.Demuxers` | **Typed demuxer** (merge từ `features/mux-demux`): [BaseDemuxer](../FFmpegArgs.Inputs.Demuxers/BaseDemuxer.cs) + 4 ImageDemuxer ([Apng](../FFmpegArgs.Inputs.Demuxers/ImageDemuxers/ApngDemuxer.cs)/[Asf](../FFmpegArgs.Inputs.Demuxers/ImageDemuxers/AsfDemuxer.cs)/[Dash](../FFmpegArgs.Inputs.Demuxers/ImageDemuxers/DashDemuxer.cs)/[Rawvideo](../FFmpegArgs.Inputs.Demuxers/ImageDemuxers/RawvideoDemuxer.cs)) + `DemuxerExtensions`. |
+| | `FFmpegArgs.Outputs.Muxers` | **Typed muxer** (merge từ `features/mux-demux`): hiện mới có [BaseMuxer](../FFmpegArgs.Outputs.Muxers/BaseMuxer.cs) skeleton (chưa có muxer cụ thể; lưu ý namespace đang sai → xem mục 9). |
 | **Thực thi** | `FFmpegArgs.Executes` | `FFmpegRender`, `FFmpegRenderConfig`, `FFmpegRenderResult`, `RenderProgress` — chạy ffmpeg, đọc tiến độ. |
 | **Codec** | `FFmpegArgs.Codec` | Wrapper encoder/decoder (H.264 / HEVC / AV1 + nhiều bộ tăng tốc phần cứng). |
 | **Filter** | `FFmpegArgs.Filters` | Base filter, attribute, **Expression engine**, interface khả năng. |
@@ -99,6 +100,7 @@ BaseOption (Options: Dictionary<key,val>)          -> ../FFmpegArgs.Cores/BaseOp
 Hệ thống interface marker phong phú trong [Interfaces/](../FFmpegArgs.Cores/Interfaces/) và [FFmpegArgs.Filters/Interfaces/](../FFmpegArgs.Filters/Interfaces/):
 - Loại media: `IImage`, `IAudio`.
 - Codec/stream: `ICodec`, `ICodecEncoder`, `ICodecDecoder`, `IStream`, `IInputStream`, `IOutputStream`...
+- Demux/Mux (merge `features/mux-demux`): `IDemux` (← `IInput`), `IMux` (← `IOutput`), `IAudioDemux`/`IImageDemux`, `IAudioMux`/`IImageMux` — ràng buộc cho `Format(...)` và các typed demuxer/muxer.
 - Khả năng filter: `ITimelineSupport` (`.Enable("expr")`), `ICommandSupport`, `ISliceThreading`, `IFramesync`, `IResamplerOptions`.
 - FilterGraph: `IFilterGraph`, `IImageFilterGraph`, `IAudioFilterGraph`.
 
@@ -186,7 +188,7 @@ Mỗi encoder phơi bày enum preset/tune/profile/rate-control... dưới dạng
 | 2 | ~~Video/Audio **Sinks** comment toàn bộ~~ | **Đã làm**: `AllowNoMapOut` + base sink + 4 sink filter + test | [SinkFilterTest.cs](../FFmpegArgs.Test/SinkFilterTest.cs) |
 | 3 | ~~`FilterStringInput` (lavfi) comment toàn bộ~~ | **Đã làm**: kích hoạt lại (token RAW) + test | [FilterStringInput.cs](../FFmpegArgs.Inputs/FilterStringInput.cs) |
 | 4 | ~~`FFplayArgs` không có lớp execute (chỉ sinh args)~~ | **Đã làm**: `FFplayRender` self-contained + cancel + test | [FFplayArgs/](../FFplayArgs/) |
-| 5 | `Inputs.Demuxers` / `Outputs.Muxers` **đã bị gỡ khỏi solution** (chỉ còn `obj` rỗng) | Option muxer/demuxer chuyển sang extension | [MuxerDemuxerOptionsExtension.cs](../FFmpegArgs.Extensions/MuxerDemuxerOptionsExtension.cs) |
+| 5 | `Inputs.Demuxers` / `Outputs.Muxers` **đã merge lại** (`features/mux-demux`) theo kiến trúc **typed** (BaseDemuxer + 4 ImageDemuxer; muxer mới có BaseMuxer skeleton) — đang **trùng** với extension generic; thêm bug `BaseMuxer.cs` khai báo nhầm `namespace FFmpegArgs.Inputs.Demuxers` | Kế hoạch **hợp nhất** extension → typed class (style `input.XxxDemux(d => …)`) + sửa namespace — xem [ROADMAP-vi.md](ROADMAP-vi.md) | [BaseMuxer.cs](../FFmpegArgs.Outputs.Muxers/BaseMuxer.cs), [MuxerDemuxerOptionsExtension.cs](../FFmpegArgs.Extensions/MuxerDemuxerOptionsExtension.cs) |
 | 6 | Filter generated thiếu expression/timeline/validate; loại `N->N`, `|->N` bị bỏ qua | Hạn chế độ phủ (**HOÃN** regen) | `.other/NotAutoGen_window.txt` |
 | 7 | Escaping Lv3 (mức process arg/shell) | **Giữ stub** (không cần do thực thi qua `ArgumentList`, không qua shell) | [FilterExtensions.cs](../FFmpegArgs.Cores/Extensions/FilterExtensions.cs) |
 | 8 | ~~Test phụ thuộc nhiều vào ffmpeg thật + media cục bộ~~ | **Đã xử lý**: tách [FFmpegArgs.Test/](../FFmpegArgs.Test/) (no-ffmpeg, CI) và [FFmpegArgs.Test.Render/](../FFmpegArgs.Test.Render/) (cần ffmpeg) | [ci.yml](../.github/workflows/ci.yml) |
@@ -202,7 +204,10 @@ Mỗi encoder phơi bày enum preset/tune/profile/rate-control... dưới dạng
 - **Execute ffplay**: `FFplayRender`/`FFplayRenderConfig`/`FFplayRenderResult` + `Render(this FFplayArg)` **self-contained** trong [FFplayArgs/](../FFplayArgs/) (không reference Executes → package decoupled).
 - **Cancel**: xác nhận `FFmpegRender` kill process khi cancel (`token.Register(Kill)`) + render test timeout.
 - **Audio encoders**: 8 lớp [Encoders/Audios/](../FFmpegArgs.Codec/Encoders/Audios/) (aac/libmp3lame/ac3/eac3/flac/alac/libopus/libvorbis), selector `-c:a:0 <name>`.
-- **Muxer/demuxer options** [MuxerDemuxerOptionsExtension.cs](../FFmpegArgs.Extensions/MuxerDemuxerOptionsExtension.cs): `-movflags` (enum `MovFlag`), `-re`, image2 `-start_number`/`-pattern_type`.
+- **Muxer/demuxer options** — hiện **tồn tại song song 2 hướng** (sẽ hợp nhất):
+  - (a) Extension generic [MuxerDemuxerOptionsExtension.cs](../FFmpegArgs.Extensions/MuxerDemuxerOptionsExtension.cs): `-movflags` (enum `MovFlag`), `-re`, image2 `-start_number`/`-pattern_type` — gắn thẳng trên `BaseInput`/`BaseOutput`.
+  - (b) **Typed** (merge `features/mux-demux`): project [FFmpegArgs.Inputs.Demuxers](../FFmpegArgs.Inputs.Demuxers/) (BaseDemuxer + 4 ImageDemuxer Apng/Asf/Dash/Rawvideo, mỗi cái fluent option riêng + `DemuxerExtensions` 2 overload: bare + `Action<TDemuxer>`) và [FFmpegArgs.Outputs.Muxers](../FFmpegArgs.Outputs.Muxers/) (mới có BaseMuxer skeleton); interface `IDemux`/`IMux`/`IAudioDemux`/`IImageDemux`/`IAudioMux`/`IImageMux` trong [FFmpegArgs.Cores/Interfaces/](../FFmpegArgs.Cores/Interfaces/); `Format(DemuxingFileFormat/MuxingFileFormat)` ràng buộc `IDemux`/`IMux`; thêm overload `SetOption(Size)` trong [BaseOption.cs](../FFmpegArgs.Cores/BaseOption.cs).
+  - **Kế hoạch hợp nhất**: dồn option format-specific vào typed class, đặt tên extension `XxxDemux`/`XxxMux` để dùng kiểu `input.Image2Demux(d => d.StartNumber(5)…)` / `output.MovMux(m => m.MovFlags(…))`; giữ `-re` ở dạng generic (không thuộc demuxer cụ thể) — xem [ROADMAP-vi.md](ROADMAP-vi.md).
 - **Subtitle**: `-c:s` (`Scodec`/`CopySubtitle`) + `-sub_charenc` ([SubtitleAVStreamOptionsExtension.cs](../FFmpegArgs.Extensions/StreamSpecifiers/SubtitleAVStreamOptionsExtension.cs)); burn-in (`subtitles`/`ass`) đã có sẵn.
 - **Culture**: (1) [BaseOption.cs](../FFmpegArgs.Cores/BaseOption.cs) format số bằng `InvariantCulture` (định tuyến `SetOptionRange`/`SetOption(object)` qua `IFormattable`); (2) Turkish-i: bỏ `enum.ToString().ToLower()` ở filter, dùng `[Name(...)]` + `GetEnumAttribute` (vd `FadeType.In`→`in` chứ không `ın`); Autogens helper dùng `ToUpperInvariant`. Sửa HẸP, **không** lặp lại commit #7 (đã revert).
 - **Tài liệu**: [EXAMPLES.md](EXAMPLES.md) ví dụ theo nhóm tính năng.
