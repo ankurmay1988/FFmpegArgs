@@ -42,7 +42,9 @@
 		<ProjectReference Include="..\FFmpegArgs.Filters.VideoSources\FFmpegArgs.Filters.VideoSources.csproj" />
 		<ProjectReference Include="..\FFmpegArgs.Filters\FFmpegArgs.Filters.csproj" />
 		<ProjectReference Include="..\FFmpegArgs.Inputs\FFmpegArgs.Inputs.csproj" />
+		<ProjectReference Include="..\FFmpegArgs.Inputs.Demuxers\FFmpegArgs.Inputs.Demuxers.csproj" />
 		<ProjectReference Include="..\FFmpegArgs.Outputs\FFmpegArgs.Outputs.csproj" />
+		<ProjectReference Include="..\FFmpegArgs.Outputs.Muxers\FFmpegArgs.Outputs.Muxers.csproj" />
 		<ProjectReference Include="..\FFmpegArgs\FFmpegArgs.csproj" />
 		<ProjectReference Include="..\FFplayArgs\FFplayArgs.csproj" />
 	</ItemGroup>

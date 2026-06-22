@@ -72,6 +72,17 @@ namespace FFmpegArgs
         /// <returns></returns>
         public static T ItsOffset<T>(this T t, TimeSpan offset) where T : BaseInput
            => t.SetOptionRange("-itsoffset", offset, TimeSpan.Zero, TimeSpan.MaxValue);
+
+        /// <summary>
+        /// -re<br></br>
+        /// Read input at the native frame rate. Mainly used to simulate a live/realtime input
+        /// (e.g. streaming, or testing time-bounded behavior). Often paired with -stream_loop.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="t"></param>
+        /// <returns></returns>
+        public static T Re<T>(this T t) where T : BaseInput
+            => t.SetFlag("-re");
         #endregion
 
 
