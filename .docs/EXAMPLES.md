@@ -111,15 +111,20 @@ Also available: `Av1_nvenc/amf/qsv/vaapi`, `Hevc_amf/mf/qsv/vaapi`, `H264_*`, so
 
 ## Muxer / demuxer options
 
+Typed muxer/demuxer with the `output.XxxMux(m => …)` / `input.XxxDemux(d => …)` closure style:
+
 ```csharp
-// Muxer (output): mp4/mov flags, additive +flag form
-output.MovFlags(MovFlag.faststart, MovFlag.empty_moov);
-// -> -movflags +faststart+empty_moov
+// Muxer (output): MOV/MP4 family (movenc) flags, additive +flag form
+videoFileOutput.MovMux(m => m.MovFlags(MovFlag.faststart, MovFlag.empty_moov));
+// -> -f mov -movflags +faststart+empty_moov
+videoFileOutput.Mp4Mux(m => m.MovFlags(MovFlag.faststart));
+// -> -f mp4 -movflags +faststart
 
 // Demuxer (input)
-input.Re();                                   // -re  (read at native rate / simulate realtime)
-input.StartNumber(5);                         // -start_number 5   (image2)
-input.PatternType(Image2PatternType.glob);    // -pattern_type glob (image2)
+imageFileInput.Re();                          // -re  (read at native rate / simulate realtime, any input)
+imageFileInput.Image2Demux(d => d
+    .StartNumber(5)                           // -start_number 5
+    .PatternType(Image2PatternType.glob));    // -pattern_type glob   (sets -f image2)
 ```
 
 ## Subtitles
