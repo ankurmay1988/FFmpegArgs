@@ -6,16 +6,16 @@
 		<AssemblyVersion>1.0.0.0</AssemblyVersion>
 		<FileVersion>1.0.0.0</FileVersion>
 		<GenerateDocumentationFile>False</GenerateDocumentationFile>
-		<!-- Project test không pack, không cần GitVersion -->
+		<IsPackable>false</IsPackable>
+		<!-- Test project: khong pack, khong can GitVersion -->
 		<EnableGitVersion>false</EnableGitVersion>
 	</PropertyGroup>
-	
-	<PropertyGroup>
-		<IsPackable>false</IsPackable>
+
+	<!-- Debug: dinh nghia 'Render' de TestRender thuc thi ffmpeg that.
+	     Them 'Play' de mo ffplay sau khi render. Project nay can ffmpeg + media trong Resources. -->
+	<PropertyGroup Condition="'$(Configuration)'=='Debug'">
+	  <DefineConstants>$(DefineConstants);Render</DefineConstants>
 	</PropertyGroup>
-	
-	<!-- KHONG dinh nghia 'Render': project nay chi dung & kiem tra chuoi argument,
-	     khong chay ffmpeg. Cac test can ffmpeg/media nam o FFmpegArgs.Test.Render. -->
 
 	<ItemGroup>
 		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.9.4" />
@@ -45,6 +45,30 @@
 		<ProjectReference Include="..\FFmpegArgs.Outputs\FFmpegArgs.Outputs.csproj" />
 		<ProjectReference Include="..\FFmpegArgs\FFmpegArgs.csproj" />
 		<ProjectReference Include="..\FFplayArgs\FFplayArgs.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <None Update="Resources\2.mp4">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
+	  <None Update="Resources\film_strip.png">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
+	  <None Update="Resources\film_strip_vertical.png">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
+	  <None Update="Resources\img0.jpg">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
+	  <None Update="Resources\img1.jpg">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
+	  <None Update="Resources\img2.jpg">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
+	  <None Update="Resources\img3.jpg">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
 	</ItemGroup>
 
 </Project>
