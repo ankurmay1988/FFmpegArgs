@@ -1,0 +1,189 @@
+# FFmpegArgs — Tóm tắt Codebase
+
+> Tài liệu sinh tự động từ việc đọc codebase (cập nhật: 2026-06-22).
+> Phiên bản hiện tại: **2.2** (`AssemblyVersion 2.1`, `FileVersion 2.2.0.0`).
+> Link code dùng đường dẫn tương đối từ thư mục `.docs/` (prefix `../`).
+
+---
+
+## 1. Tổng quan
+
+**FFmpegArgs** là một thư viện C# kiểu *CLI-wrapper*: nó **sinh chuỗi argument** cho file thực thi `ffmpeg`/`ffplay` bằng một fluent API type-safe, rồi (tùy chọn) chạy tiến trình ffmpeg và đọc tiến độ encode.
+
+Điểm nổi bật so với các wrapper khác: hệ thống **FilterGraph** mô hình hóa `-filter_complex` của ffmpeg — cho phép nối filter dạng chuỗi/đồ thị, tự sinh tên map (`[0:v:0]`, `[f_3]`...) và tự escape ký tự đặc biệt.
+
+- Hỗ trợ input/output dạng **file / url / pipe (stdin/stdout)**.
+- Hoạt động trên mọi hệ điều hành nếu chạy được `ffmpeg`.
+- **~230 filter viết tay** + **470 filter auto-generate** ≈ **700 filter**.
+- Không phụ thuộc NuGet bên ngoài (chỉ dùng BCL).
+
+### Multi-targeting & ngôn ngữ
+Cấu hình chung tại [ProjectBuildProperties.targets](../ProjectBuildProperties.targets):
+- `TargetFrameworks`: **netstandard2.0; net6.0; net8.0**
+- `LangVersion`: **12.0**, `Nullable`: **enable**
+- `GenerateDocumentationFile`: true, tắt cảnh báo `CS1591`.
+
+---
+
+## 2. Bản đồ Solution (21 project)
+
+File giải pháp: [FFmpegArgs.sln](../FFmpegArgs.sln)
+
+| Nhóm | Project | Vai trò |
+|------|---------|---------|
+| **Lõi** | `FFmpegArgs.Cores` | Class/interface nền tảng: Option, Map, Stream, Input/Output base, **FilterGraph**, enums, escaping. |
+| | `FFmpegArgs` | Entry point: class **`FFmpegArg`** — gom input/output/filtergraph, sinh full commandline. |
+| | `FFmpegArgs.Extensions` | Extension method fluent cho global/input/output/per-stream options. |
+| **I/O** | `FFmpegArgs.Inputs` | Các loại input cụ thể (File/Url/Pipe/Concat cho Video/Audio/Image). |
+| | `FFmpegArgs.Outputs` | Các loại output cụ thể. |
+| | `FFmpegArgs.Inputs.Demuxers` / `.Outputs.Muxers` | (Khung) cho option đặc thù demuxer/muxer — **hiện trống**. |
+| **Thực thi** | `FFmpegArgs.Executes` | `FFmpegRender`, `FFmpegRenderConfig`, `FFmpegRenderResult`, `RenderProgress` — chạy ffmpeg, đọc tiến độ. |
+| **Codec** | `FFmpegArgs.Codec` | Wrapper encoder/decoder (H.264 / HEVC / AV1 + nhiều bộ tăng tốc phần cứng). |
+| **Filter** | `FFmpegArgs.Filters` | Base filter, attribute, **Expression engine**, interface khả năng. |
+| | `.Filters.VideoFilters` (76) | Filter video viết tay. |
+| | `.Filters.AudioFilters` (97) | Filter audio viết tay. |
+| | `.Filters.VideoSources` (24) / `.AudioSources` (9) / `.MultimediaSources` (2) | Source filter (sinh khung hình/âm thanh: testsrc, color, sine...). |
+| | `.Filters.Multimedia` (7) | Filter đa phương tiện (concat, split, select...). |
+| | `.Filters.VideoSinks` (2) / `.AudioSinks` (2) | Sink filter — **đang để comment, chưa hoàn thiện**. |
+| | `.Filters.OpenCLVideoFilters` (17) | Filter tăng tốc OpenCL. |
+| | `.Filters.VAAPIVideoFilters` (1) | Filter VAAPI. |
+| | `.Filters.Generated` (470) | Filter **auto-generate** từ `ffmpeg -filters`/`-h full`. |
+| **ffplay** | `FFplayArgs` | Wrapper `ffplay` — **sơ khai** (chỉ sinh args, chưa có execute). |
+| **Công cụ** | `Autogens` | Console app (net8.0) sinh code: filter `.g.cs`, enum Codecs/Demuxer/Muxer. |
+| **Test** | `FFmpegArgs.Test` | MSTest (net8.0) — 23 file test, 50 `[TestMethod]`. |
+
+---
+
+## 3. Kiến trúc lõi (`FFmpegArgs.Cores`)
+
+### 3.1 Cây kế thừa Option
+Mọi thành phần sinh argument đều bắt nguồn từ một dictionary option:
+
+```
+BaseOption (Options: Dictionary<key,val>)          -> ../FFmpegArgs.Cores/BaseOption.cs
+ └ BaseArgsOption (GetOptionArgs)                   -> ../FFmpegArgs.Cores/BaseArgsOption.cs
+    └ BaseArgsOptionFlag (Flags: HashSet)           -> ../FFmpegArgs.Cores/BaseArgsOptionFlag.cs
+       └ BaseInputOutput (PipeStream, AVStreamArgs) -> ../FFmpegArgs.Cores/BaseInputOutput.cs
+          ├ BaseInput  -> ../FFmpegArgs.Cores/Inputs/BaseInput.cs
+          └ BaseOutput -> ../FFmpegArgs.Cores/Outputs/BaseOutput.cs
+```
+- `SetOption / SetOptionRange / SetFlag` là cách "thoát hiểm" để thêm option chưa có wrapper.
+
+### 3.2 Input / Output / Stream
+- Input base: [BaseInput.cs](../FFmpegArgs.Cores/Inputs/BaseInput.cs), phân nhánh [ImageInput](../FFmpegArgs.Cores/Inputs/ImageInput.cs) / [AudioInput](../FFmpegArgs.Cores/Inputs/AudioInput.cs) / [VideoInput](../FFmpegArgs.Cores/Inputs/VideoInput.cs) (video = nhiều image stream + audio stream).
+- Output base: [BaseOutput.cs](../FFmpegArgs.Cores/Outputs/BaseOutput.cs), tương tự với [VideoOutput](../FFmpegArgs.Cores/Outputs/VideoOutput.cs).
+- Stream (một luồng `v`/`a` với index): [BaseAVStream.cs](../FFmpegArgs.Cores/Streams/BaseAVStream.cs).
+  - `InputAVStream.GetAllArgs()` sinh `-c:v:0 ...` (per-stream codec/option đầu vào).
+  - `OutputAVStream.GetAllArgs()` sinh cả `-map [name]` + `-c:v:0 ...` (đầu ra).
+
+### 3.3 Hệ thống Map (kết nối)
+[BaseMap.cs](../FFmpegArgs.Cores/Maps/BaseMap.cs) là "dây nối" giữa input/filter và filter/output:
+- `MapName`: nếu là input → `"{index}:v:{streamIndex}"`; nếu là output của filter → tên tự sinh `f_{filterIndex}`.
+- `IsInput`, `IsMapped` (đã dùng chưa) — dùng để validate đồ thị.
+- Phân loại: [ImageMap](../FFmpegArgs.Cores/Maps/ImageMap.cs), [AudioMap](../FFmpegArgs.Cores/Maps/AudioMap.cs), [VideoMap](../FFmpegArgs.Cores/Maps/VideoMap.cs) (cặp image+audio maps).
+
+### 3.4 FilterGraph — trái tim của thư viện
+[FilterGraph.cs](../FFmpegArgs.Cores/Filters/FilterGraph.cs) + [BaseFilter.cs](../FFmpegArgs.Cores/Filters/BaseFilter.cs) + [FilterChain.cs](../FFmpegArgs.Cores/Filters/FilterChain.cs):
+
+1. Mỗi `BaseFilter` khi khởi tạo nhận các map đầu vào, **tự đăng ký** vào `FilterGraph` (`AddFilter`) và tự tạo map đầu ra qua `AddMapOut()`.
+2. `GetFilterValue()` sinh `[in1][in2]name=opt1=val1:opt2=val2[out1]` — giá trị một filter.
+3. Khi build, `FilterGraph.GetFiltersArgs()`:
+   - Kiểm tra không còn map nào "treo" (chưa map vào đâu) → ném lỗi nếu có.
+   - **useChain=true** (mặc định): [FilterChain.BuildChains](../FFmpegArgs.Cores/Filters/FilterChain.cs) gộp các filter nối tiếp 1-vào-1-ra thành chuỗi `f1,f2,f3` để rút gọn; nối các chuỗi bằng `;`.
+   - **useChain=false**: mỗi filter là một mệnh đề riêng, nối bằng `;`.
+4. **Escaping 2 cấp** tại [FilterExtensions.cs](../FFmpegArgs.Cores/Extensions/FilterExtensions.cs): Lv1 (giá trị option) + Lv2 (mức filter). *(Lv3 — mức argument — còn bỏ ngỏ, đang comment.)*
+
+### 3.5 Interface đánh dấu khả năng
+Hệ thống interface marker phong phú trong [Interfaces/](../FFmpegArgs.Cores/Interfaces/) và [FFmpegArgs.Filters/Interfaces/](../FFmpegArgs.Filters/Interfaces/):
+- Loại media: `IImage`, `IAudio`.
+- Codec/stream: `ICodec`, `ICodecEncoder`, `ICodecDecoder`, `IStream`, `IInputStream`, `IOutputStream`...
+- Khả năng filter: `ITimelineSupport` (`.Enable("expr")`), `ICommandSupport`, `ISliceThreading`, `IFramesync`, `IResamplerOptions`.
+- FilterGraph: `IFilterGraph`, `IImageFilterGraph`, `IAudioFilterGraph`.
+
+---
+
+## 4. Hệ thống Filter
+
+### 4.1 Base & cách viết một filter
+- Base type theo cặp vào→ra: `ImageToImageFilter`, `AudioToAudioFilter`, `SourceToImageFilter`, `SourceToAudioFilter`... trong [FFmpegArgs.Filters/BaseFilters/](../FFmpegArgs.Filters/BaseFilters/).
+- **Expression engine** [FFmpegExpression.cs](../FFmpegArgs.Filters/Expressions/FFmpegExpression.cs): parse & validate biểu thức ffmpeg (abs/sin/cos/if/clip...) theo thuật toán shunting-yard, dùng cho các tham số động (vd. `x="(W-w)/2"`).
+- Attribute `FloatRangeAttribute` để gắn min/max cho enum option.
+
+Mẫu một filter (vd. [ScaleFilter.cs](../FFmpegArgs.Filters.VideoFilters/Filters/ScaleFilter.cs), [OverLayFilter.cs](../FFmpegArgs.Filters.VideoFilters/Filters/OverLayFilter.cs), [ColorKeyFilter.cs](../FFmpegArgs.Filters.VideoFilters/Filters/ColorKeyFilter.cs)):
+```csharp
+public class ScaleFilter : ImageToImageFilter, ICommandSupport {
+    internal ScaleFilter(ImageMap map) : base("scale", map) { AddMapOut(); }
+    public ScaleFilter W(ExpressionValue w) { ... }   // fluent setter
+}
+public static class ScaleFilterExtension {
+    public static ScaleFilter ScaleFilter(this ImageMap m) => new ScaleFilter(m);
+}
+```
+→ Người dùng gọi `map.ScaleFilter().W("iw/3").H("ih/3").MapOut` (lấy map đầu ra), hoặc `.SplitFilter(2).MapsOut` (nhiều đầu ra).
+
+### 4.2 Filter auto-generate
+- Project [Autogens](../Autogens/Program.cs) đọc output của `ffmpeg -filters` và `ffmpeg -h full` (bản backup lưu ở [.other/](../.other/)), dùng **Roslyn** (`Microsoft.CodeAnalysis.CSharp`) sinh ra 470 file `.g.cs` vào [FFmpegArgs.Filters.Generated/Gen/](../FFmpegArgs.Filters.Generated/Gen/).
+- Generated khác filter viết tay: **chỉ có option cơ bản**, không có validate expression, ít interface, doc lấy từ help text. Ví dụ [HflipFilterGen.g.cs](../FFmpegArgs.Filters.Generated/Gen/HflipFilterGen.g.cs).
+- Logic sinh: [FiltersGen.cs](../Autogens/Filter/FiltersGen.cs); danh sách filter **bị bỏ qua** (loại `N->N`, `|->N`, thiếu doc) ghi tại `.other/NotAutoGen_window.txt`.
+
+---
+
+## 5. Input / Output / Options
+
+- Input cụ thể ([FFmpegArgs.Inputs/](../FFmpegArgs.Inputs/)): `VideoFileInput`, `AudioFileInput`, `ImageFileInput`, `*PipeInput`, `*UrlInput`, `VideoFilesConcatInput`, `ImageFilesConcatInput`, `*FilterGraphInput`. *(`FilterStringInput` đang comment toàn bộ — chưa kích hoạt.)*
+- Output cụ thể ([FFmpegArgs.Outputs/](../FFmpegArgs.Outputs/)): `VideoFileOutput`, `AudioFileOutput`, `ImageFileOutput`, `*PipeOutput`, `*UrlOutput`.
+- Option khai báo qua extension ([FFmpegArgs.Extensions/](../FFmpegArgs.Extensions/)): global (`-y`, `-hide_banner`...), input/output (`-f`, `-ss`, `-stream_loop`...), per-stream video/audio/subtitle (`-r`, `-vframes`...). Enum format sinh sẵn: [DemuxingFileFormat.g.cs](../FFmpegArgs.Cores/Enums/DemuxingFileFormat.g.cs), [MuxingFileFormat.g.cs](../FFmpegArgs.Cores/Enums/MuxingFileFormat.g.cs).
+
+---
+
+## 6. Thực thi (`FFmpegArgs.Executes`)
+
+Luồng: `FFmpegArg.GetFullCommandline()` → `FFmpegRender` → `Execute()`.
+
+- [FFmpegRender.cs](../FFmpegArgs.Executes/FFmpegRender.cs): `BuildProcess()` tạo `ProcessStartInfo` (redirect stdin/stdout/stderr), gắn handler parse stderr; `Execute()/ExecuteAsync()` (có/không callback tiến độ, có `CancellationToken`). Hỗ trợ pipe qua `WithStdInStream` / `WithStdOutStream`.
+- [FFmpegRenderConfig.cs](../FFmpegArgs.Executes/FFmpegRenderConfig.cs): đường dẫn binary (mặc định `"ffmpeg"`), thư mục làm việc, dùng filter-chain hay không, ép dùng filter-script (`FS.txt`), giới hạn độ dài argument (Windows ~32766).
+- [FFmpegRenderResult.cs](../FFmpegArgs.Executes/FFmpegRenderResult.cs): `ExitCode`, `ErrorDatas`, `EnsureSuccess()` (ném `FFmpegRenderException` nếu lỗi).
+- [RenderProgress.cs](../FFmpegArgs.Executes/RenderProgress.cs): regex parse `frame=/fps=/size=/time=/bitrate=/speed=` từ stderr.
+
+---
+
+## 7. Codec (`FFmpegArgs.Codec`)
+
+39 file wrapper. Base: [BaseCodec.cs](../FFmpegArgs.Codec/BaseCodec.cs) → `BaseCodecEncoder` / `BaseCodecDecoder`.
+
+Độ phủ encoder video rất rộng (mới bổ sung HEVC & AV1 gần đây — xem git log):
+- **H.264**: libx264, nvenc, vaapi, qsv, mf, amf, libopenh264.
+- **HEVC/H.265**: libx265, nvenc, vaapi, qsv, mf, amf.
+- **AV1**: libaom-av1, librav1e, nvenc, qsv, vaapi, amf.
+- Decoder: H264 / HEVC / AV1 ([Decoders/Images/](../FFmpegArgs.Codec/Decoders/Images/)).
+- Audio: chủ yếu qua extension ([Encoders/Audios/](../FFmpegArgs.Codec/Encoders/Audios/)) — ít wrapper class chuyên biệt.
+
+Mỗi encoder phơi bày enum preset/tune/profile/rate-control... dưới dạng fluent (vd. [IH264_libx264_Encoder.cs](../FFmpegArgs.Codec/Encoders/Images/IH264_libx264_Encoder.cs)).
+
+---
+
+## 8. Build / Đóng gói / Test
+
+- **Đóng gói NuGet** bằng PowerShell + `dotnet pack` + `.nuspec` per-project:
+  - [NugetAll.ps1](../NugetAll.ps1) → lặp ~17 project, gọi [FunctionModule.psm1](../FunctionModule.psm1) (`NugetPack`/`NugetPush`); [BuildSingle.psm1](../BuildSingle.psm1) build một project. Cả hai **chỉ chạy ở branch `master`** (`Assert-MasterBranch`).
+  - **Version sinh tự động bằng GitVersion** ([GitVersion.yml](../GitVersion.yml), `mode: ManualDeployment`, tag-prefix `v`, master `increment: None`): tag `vMAJOR.MINOR.0` → `PackageVersion = Major.Minor.<số commit kể từ tag>` (vd HEAD hiện tại = `2.2.6`). `AssemblyVersion = Major.Minor.0.0`. Cấu hình tại target `SetVersionFromGitVersion` trong [ProjectBuildProperties.targets](../ProjectBuildProperties.targets); nuspec dùng token `$version$`/`$id$`. Package phụ thuộc khóa khoảng `[2.2,2.3)`.
+  - Đóng gói kèm `.dll/.pdb/.xml` + README; **chưa** có symbol package `.snupkg`.
+- **Test** ([FFmpegArgs.Test/](../FFmpegArgs.Test/)): MSTest, gồm unit build-args ([BuildTest/](../FFmpegArgs.Test/BuildTest/)), feature ([FeatureTest/](../FFmpegArgs.Test/FeatureTest/): Expression, Pipe, Rational), và **integration** chạy ffmpeg thật ([FiltersTest/](../FFmpegArgs.Test/FiltersTest/), slideshow). Cần `ffmpeg` trong PATH + media mẫu.
+- **Quy ước code** [.editorconfig](../.editorconfig): C# 12, PascalCase, interface prefix `I`, namespace block-scoped, CRLF, indent 4.
+
+---
+
+## 9. Vấn đề / khoảng trống đã ghi nhận
+
+| # | Hạng mục | Trạng thái | Vị trí |
+|---|----------|-----------|--------|
+| 1 | `FFplayArg.GetFullCommandlineWithFilterScript` dùng `"filter_complex_script"` **thiếu dấu `-`** | Bug | [FFplayArg.cs:152](../FFplayArgs/FFplayArg.cs#L152) (so với [FFmpegArg.cs:226](../FFmpegArgs/FFmpegArg.cs#L226)) |
+| 2 | Video/Audio **Sinks** comment toàn bộ | Chưa hoàn thiện | [BuffersinkFilter.cs](../FFmpegArgs.Filters.VideoSinks/Filters/BuffersinkFilter.cs) |
+| 3 | `FilterStringInput` (lavfi) comment toàn bộ | Chưa hoàn thiện | [FilterStringInput.cs](../FFmpegArgs.Inputs/FilterStringInput.cs) |
+| 4 | `FFplayArgs` không có lớp execute (chỉ sinh args) | Sơ khai | [FFplayArgs/](../FFplayArgs/) |
+| 5 | `Inputs.Demuxers` / `Outputs.Muxers` trống (chưa có option class đặc thù) | Khung rỗng | — |
+| 6 | Filter generated thiếu expression/timeline/validate; loại `N->N`, `|->N` bị bỏ qua | Hạn chế độ phủ | `.other/NotAutoGen_window.txt` |
+| 7 | Escaping Lv3 (mức argument) chưa làm | Bỏ ngỏ | [FilterExtensions.cs](../FFmpegArgs.Cores/Extensions/FilterExtensions.cs) |
+| 8 | Test phụ thuộc nhiều vào ffmpeg thật + media cục bộ | Khó CI | [FFmpegArgs.Test/](../FFmpegArgs.Test/) |
+
+> Kế hoạch xử lý các mục này nằm ở [ROADMAP.md](ROADMAP.md).
