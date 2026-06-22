@@ -201,10 +201,9 @@ Mỗi encoder phơi bày enum preset/tune/profile/rate-control... dưới dạng
 - **lavfi input** `FilterStringInput` (`-f lavfi -i`) — token RAW (không tự bọc `"`).
 - **Execute ffplay**: `FFplayRender`/`FFplayRenderConfig`/`FFplayRenderResult` + `Render(this FFplayArg)` **self-contained** trong [FFplayArgs/](../FFplayArgs/) (không reference Executes → package decoupled).
 - **Cancel**: xác nhận `FFmpegRender` kill process khi cancel (`token.Register(Kill)`) + render test timeout.
-- **Audio encoders** (tag `v2.4.0`): 8 lớp [Encoders/Audios/](../FFmpegArgs.Codec/Encoders/Audios/) (aac/libmp3lame/ac3/eac3/flac/alac/libopus/libvorbis), selector `-c:a:0 <name>`.
+- **Audio encoders**: 8 lớp [Encoders/Audios/](../FFmpegArgs.Codec/Encoders/Audios/) (aac/libmp3lame/ac3/eac3/flac/alac/libopus/libvorbis), selector `-c:a:0 <name>`.
 - **Muxer/demuxer options** [MuxerDemuxerOptionsExtension.cs](../FFmpegArgs.Extensions/MuxerDemuxerOptionsExtension.cs): `-movflags` (enum `MovFlag`), `-re`, image2 `-start_number`/`-pattern_type`.
 - **Subtitle**: `-c:s` (`Scodec`/`CopySubtitle`) + `-sub_charenc` ([SubtitleAVStreamOptionsExtension.cs](../FFmpegArgs.Extensions/StreamSpecifiers/SubtitleAVStreamOptionsExtension.cs)); burn-in (`subtitles`/`ass`) đã có sẵn.
-- **Culture** (tag `v2.5.0`): [BaseOption.cs](../FFmpegArgs.Cores/BaseOption.cs) format số bằng `InvariantCulture` (định tuyến `SetOptionRange`/`SetOption(object)` qua `IFormattable`). Sửa HẸP, **không** lặp lại commit #7 (đã revert).
+- **Culture**: (1) [BaseOption.cs](../FFmpegArgs.Cores/BaseOption.cs) format số bằng `InvariantCulture` (định tuyến `SetOptionRange`/`SetOption(object)` qua `IFormattable`); (2) Turkish-i: bỏ `enum.ToString().ToLower()` ở filter, dùng `[Name(...)]` + `GetEnumAttribute` (vd `FadeType.In`→`in` chứ không `ın`); Autogens helper dùng `ToUpperInvariant`. Sửa HẸP, **không** lặp lại commit #7 (đã revert).
 - **Tài liệu**: [EXAMPLES.md](EXAMPLES.md) ví dụ theo nhóm tính năng.
-- **Quy tắc tag**: `v2.4.0` @ commit feat audio encoder đầu; `v2.5.0` @ commit Culture (gắn vào commit ĐẦU của tính năng, patch = commits-since-tag).
 - **HOÃN** (rủi ro khi không giám sát): làm giàu filter generated, đồng bộ ffmpeg version (regen → diff lớn); subtitle stream/map đầy đủ; `.snupkg` thật (cần migrate SDK-pack).
