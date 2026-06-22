@@ -44,7 +44,10 @@
 ## P2 — Mở rộng độ phủ (2.4)
 
 - [x] **Audio encoder wrappers** (đã làm): 8 lớp encoder trong [FFmpegArgs.Codec/Encoders/Audios/](../FFmpegArgs.Codec/Encoders/Audios/) — aac, libmp3lame, ac3, eac3, flac, alac, libopus, libvorbis (option lấy từ `ffmpeg -h encoder=<name>` thật, dump kèm comment). `libfdk_aac` không có trong build chuẩn (non-free) nên bỏ. 14 test arg-build trong [AudioEncoderTest.cs](../FFmpegArgs.Test/AudioEncoderTest.cs).
-- [x] **Demuxer/Muxer options** (đã làm, một phần): hai project `FFmpegArgs.Inputs.Demuxers`/`FFmpegArgs.Outputs.Muxers` thực ra ĐÃ BỊ GỠ khỏi solution (chỉ còn `obj` rỗng) → KHÔNG tái tạo project NuGet mới (rủi ro đóng gói). Thay bằng extension trong [MuxerDemuxerOptionsExtension.cs](../FFmpegArgs.Extensions/MuxerDemuxerOptionsExtension.cs): muxer `-movflags` (enum `MovFlag`); demuxer `-re`/`-start_number`/`-pattern_type` (image2). concat/hls/dash sâu hơn: chưa.
+- [x] **Demuxer/Muxer options** (đã làm — **đang tồn tại 2 hướng, cần hợp nhất**):
+  - (a) Extension generic [MuxerDemuxerOptionsExtension.cs](../FFmpegArgs.Extensions/MuxerDemuxerOptionsExtension.cs) (đợt P2): muxer `-movflags` (enum `MovFlag`); demuxer `-re`/`-start_number`/`-pattern_type` (image2) — gắn thẳng trên `BaseInput`/`BaseOutput`.
+  - (b) **Typed** (merge `features/mux-demux` vào `dev`): 2 project `FFmpegArgs.Inputs.Demuxers` / `FFmpegArgs.Outputs.Muxers` **đã QUAY LẠI solution** với kiến trúc typed — `BaseDemuxer` + 4 ImageDemuxer (Apng/Asf/Dash/Rawvideo) + `DemuxerExtensions`; `Outputs.Muxers` mới có `BaseMuxer` skeleton; interface `IDemux`/`IMux`/…
+  - → Hai hướng **trùng chức năng**. Kế hoạch hợp nhất xem mục **[Hợp nhất Demuxer/Muxer](#hợp-nhất-demuxermuxer-typed--extension)** bên dưới. concat/hls/dash sâu hơn: chưa.
 - [x] **Subtitle** (đã làm, một phần): burn-in (`subtitles`/`ass` video filter) đã có sẵn; thêm `-c:s` (`Scodec`/`CopySubtitle`) + `-sub_charenc` trong [SubtitleAVStreamOptionsExtension.cs](../FFmpegArgs.Extensions/StreamSpecifiers/SubtitleAVStreamOptionsExtension.cs). Kiến trúc subtitle stream/map đầy đủ (mux subtitle stream như image/audio map): **HOÃN** (thay đổi kiến trúc lớn).
 - [ ] **Làm giàu filter generated** (**HOÃN** — chạy lại autogen sinh diff rất lớn, rủi ro khi không giám sát): nâng cấp [Autogens/Filter/FiltersGen.cs](../Autogens/Filter/FiltersGen.cs):
   - Hỗ trợ thêm loại bị bỏ qua (`N->N`, `|->N`) — xem danh sách `.other/NotAutoGen_window.txt`.
@@ -62,6 +65,43 @@
 - [ ] **Autogen bằng Roslyn Source Generator**: chuyển [Autogens](../Autogens/) (console app sinh file `.g.cs`) sang incremental source generator để filter generated luôn đồng bộ khi build (giảm rủi ro lệch nguồn).
 - [ ] **AOT / trimming friendly**: kiểm tra tương thích NativeAOT/trimming (tránh reflection runtime), gắn annotation phù hợp.
 - [ ] **API streaming nâng cao**: helper cho realtime/streaming output (RTMP/SRT/HLS), và pipe đồng thời nhiều stream.
+
+---
+
+## Hợp nhất Demuxer/Muxer (typed ↔ extension)
+
+> Sau khi merge `features/mux-demux`, option demuxer/muxer tồn tại **2 hướng song song**. Mục tiêu: gom về **một** kiểu API typed, dùng coding style closure:
+> ```csharp
+> imageFileInput.Image2Demux(d => d.StartNumber(5).PatternType(Image2PatternType.glob));
+> videoFileOutput.MovMux(m => m.MovFlags(MovFlag.faststart, MovFlag.empty_moov));
+> ```
+
+### Hiện trạng 2 hướng
+
+| Option | Hướng (a) generic — [MuxerDemuxerOptionsExtension.cs](../FFmpegArgs.Extensions/MuxerDemuxerOptionsExtension.cs) | Hướng (b) typed — [Demuxers](../FFmpegArgs.Inputs.Demuxers/)/[Muxers](../FFmpegArgs.Outputs.Muxers/) |
+|--------|----------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------|
+| image2 `-start_number`/`-pattern_type` | `input.StartNumber(5).PatternType(...)` trên mọi `BaseInput` | chưa có `Image2Demuxer` |
+| mov/mp4 `-movflags` | `output.MovFlags(...)` trên mọi `BaseOutput` | chưa có `MovMuxer` (mới `BaseMuxer` skeleton) |
+| `-re` | `input.Re()` trên mọi `BaseInput` | (không thuộc demuxer cụ thể) |
+| apng/asf/dash/rawvideo | — | đã có 4 `*Demuxer` typed |
+
+**Cơ chế style closure** đã có sẵn ở overload thứ 2 của `DemuxerExtensions` (vd [RawvideoDemuxer.cs:35](../FFmpegArgs.Inputs.Demuxers/ImageDemuxers/RawvideoDemuxer.cs#L35)): `static TInput XxxDemuxer<TInput>(this TInput input, Action<XxxDemuxer> action)`. Việc cần làm chỉ là (1) **đổi tên** extension sang hậu tố `Demux`/`Mux`, (2) **chuyển** option generic vào typed class.
+
+### Kế hoạch (chưa code — chờ duyệt)
+
+1. **Quy ước đặt tên**: extension method dùng hậu tố động từ `Demux`/`Mux` (`input.Image2Demux(...)`, `output.MovMux(...)`); **class** giữ danh từ `*Demuxer`/`*Muxer`. → Đổi 4 extension hiện có `ApngDemuxer/AsfDemuxer/DashDemuxer/RawvideoDemuxer` → `ApngDemux/AsfDemux/DashDemux/RawvideoDemux` (giữ nguyên tên class).
+2. **Tạo `Image2Demuxer`** (`FFmpegArgs.Inputs.Demuxers`, format `image2`): chuyển `StartNumber`/`PatternType` + enum `Image2PatternType` vào đây. Extension `Image2Demux(this TInput, …)`.
+3. **Tạo `MovMuxer`** (`FFmpegArgs.Outputs.Muxers` — muxer cụ thể **đầu tiên**, format mov/mp4): chuyển `MovFlags` + enum `MovFlag` vào đây. Extension `MovMux(this TOutput, …)`.
+4. **Giữ `-re` ở dạng generic**: dời `Re()` sang [InputOutputOptionsExtension.cs](../FFmpegArgs.Extensions/) (là option đọc input tốc độ gốc, áp cho mọi input — KHÔNG nhét vào demuxer cụ thể).
+5. **Xóa** [MuxerDemuxerOptionsExtension.cs](../FFmpegArgs.Extensions/MuxerDemuxerOptionsExtension.cs) sau khi đã dời hết.
+6. **Sửa bug** namespace [BaseMuxer.cs:1](../FFmpegArgs.Outputs.Muxers/BaseMuxer.cs#L1): `FFmpegArgs.Inputs.Demuxers` → `FFmpegArgs.Outputs.Muxers`.
+7. **Test**: viết lại [MuxerDemuxerOptionsTest.cs](../FFmpegArgs.Test/MuxerDemuxerOptionsTest.cs) theo API mới + test build-args cho `Image2Demux`/`MovMux`.
+8. **Đóng gói**: cân nhắc thêm 2 project mới vào [NugetAll.ps1](../NugetAll.ps1) (quyết định khi release).
+
+### Điểm cần quyết trước khi code
+
+- **Ép `-f` hay không**: `BaseDemuxer`/`BaseMuxer` tự set `-f <format>` trong ctor. `Image2Demux` → thêm `-f image2` (hợp lý). Nhưng `MovMux` → thêm `-f mov`; với output `.mp4` có thể muốn `-f mp4` (hoặc không ép gì, để ffmpeg suy từ đuôi file). Cần chọn: ép `-f mov`, tách `Mp4Muxer`/`MovMuxer` riêng, hay cho `MovFlags` không kèm ép format.
+- **Breaking change**: cả 2 hướng đều **chưa release** (mới ở `dev`) → đổi tên/di chuyển API **an toàn**, không phá bản đã phát hành.
 
 ---
 
