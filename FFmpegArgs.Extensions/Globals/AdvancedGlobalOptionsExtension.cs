@@ -109,6 +109,33 @@ namespace FFmpegArgs
         /// <returns></returns>
         public static T VSync<T>(this T output, VSyncMethod vsync) where T : BaseOption, IFFmpegArg
             => output.SetOption("-vsync", vsync);
+
+        /// <summary>
+        /// -init_hw_device<br></br>
+        /// Initialise a new hardware device of the given type, optionally giving it a name and selecting
+        /// the underlying device. The full argument form is <c>type[=name][:device[,key=value...]]</c>
+        /// (for example <c>cuda</c>, <c>cuda=gpu0</c> or <c>vaapi:/dev/dri/renderD128</c>).
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="ffmpegArg"></param>
+        /// <param name="args">The device specification, e.g. <c>cuda</c>, <c>cuda=gpu0</c> or <c>vaapi:/dev/dri/renderD128</c>.</param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentNullException"></exception>
+        public static T InitHwDevice<T>(this T ffmpegArg, string args) where T : BaseOption, IFFmpegArg
+            => ffmpegArg.SetOption("-init_hw_device", args);
+
+        /// <summary>
+        /// -filter_hw_device<br></br>
+        /// Pass the hardware device with the given name (created via -init_hw_device) to any filter in any
+        /// filter graph that needs it. The name refers to a device created with -init_hw_device.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="ffmpegArg"></param>
+        /// <param name="name">The name of a device previously created with -init_hw_device.</param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentNullException"></exception>
+        public static T FilterHwDevice<T>(this T ffmpegArg, string name) where T : BaseOption, IFFmpegArg
+            => ffmpegArg.SetOption("-filter_hw_device", name);
     }
 
 

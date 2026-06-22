@@ -83,6 +83,58 @@ namespace FFmpegArgs
         /// <returns></returns>
         public static T Re<T>(this T t) where T : BaseInput
             => t.SetFlag("-re");
+
+        /// <summary>
+        /// -hwaccel<br></br>
+        /// Use hardware acceleration to decode the matching stream(s) of the input that follows.
+        /// The allowed values depend on how the running ffmpeg binary was built.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="t"></param>
+        /// <param name="hwaccel">A well-known hardware acceleration method.</param>
+        /// <returns></returns>
+        public static T Hwaccel<T>(this T t, HardwareAccel hwaccel) where T : BaseInput
+            => t.SetOption("-hwaccel", hwaccel);
+
+        /// <summary>
+        /// -hwaccel<br></br>
+        /// Use hardware acceleration to decode the matching stream(s) of the input that follows.
+        /// The allowed values depend on how the running ffmpeg binary was built.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="t"></param>
+        /// <param name="hwaccel">The hardware acceleration method name (e.g. <c>cuda</c>, <c>qsv</c>, <c>vaapi</c>).</param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentNullException"></exception>
+        public static T Hwaccel<T>(this T t, string hwaccel) where T : BaseInput
+            => t.SetOption("-hwaccel", hwaccel);
+
+        /// <summary>
+        /// -hwaccel_device<br></br>
+        /// Select a device to use for hardware acceleration of the input that follows.<br></br>
+        /// This option only makes sense when the -hwaccel option is also specified. Its exact meaning
+        /// depends on the specific hardware acceleration method chosen.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="t"></param>
+        /// <param name="device">The hardware device to use (e.g. a device index, a DRM path or an X11 display name).</param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentNullException"></exception>
+        public static T HwaccelDevice<T>(this T t, string device) where T : BaseInput
+            => t.SetOption("-hwaccel_device", device);
+
+        /// <summary>
+        /// -hwaccel_output_format<br></br>
+        /// Select the output (hardware) pixel format for the hardware accelerated decoding of the input
+        /// that follows. If not set, the default for the chosen method is used.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="t"></param>
+        /// <param name="pixelFormat">The hardware pixel format (e.g. <c>cuda</c>, <c>qsv</c>, <c>vaapi</c>).</param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentNullException"></exception>
+        public static T HwaccelOutputFormat<T>(this T t, string pixelFormat) where T : BaseInput
+            => t.SetOption("-hwaccel_output_format", pixelFormat);
         #endregion
 
 
