@@ -1,18 +1,26 @@
-﻿namespace FFmpegArgs.Filters.AudioSinks
+namespace FFmpegArgs.Filters.AudioSinks
 {
-#warning Need more info
-    // #NeedMoreInfo
-    ///// <summary>
-    ///// ... anullsink         A->|       Do absolutely nothing with the input audio.<br></br>
-    ///// https://ffmpeg.org/ffmpeg-filters.html#anullsink
-    ///// </summary>
-    //public class AnullsinkFilter
-    //{
-    //  internal AnullsinkFilter()
-    //  {
-    //  }
-    //}
-    //public static class AnullsinkFilterExtensions
-    //{
-    //}
+    /// <summary>
+    /// ... anullsink         A-&gt;|       Do absolutely nothing with the input audio.<br></br>
+    /// https://ffmpeg.org/ffmpeg-filters.html#anullsink
+    /// </summary>
+    public class AnullsinkFilter : AudioToSinkFilter
+    {
+        internal AnullsinkFilter(AudioMap audioMap) : base("anullsink", audioMap)
+        {
+        }
+    }
+    /// <summary>
+    ///
+    /// </summary>
+    public static class AnullsinkFilterExtensions
+    {
+        /// <summary>
+        /// Do absolutely nothing with the input audio.
+        /// </summary>
+        /// <param name="audioMap"></param>
+        /// <returns></returns>
+        public static AnullsinkFilter AnullsinkFilter(this AudioMap audioMap)
+          => new AnullsinkFilter(audioMap);
+    }
 }
