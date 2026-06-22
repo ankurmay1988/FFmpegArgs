@@ -1,11 +1,13 @@
-Import-Module $PSScriptRoot\FunctionModule.psm1
+Import-Module $PSScriptRoot\FunctionModule.psm1 -Force
 
 function NugetBuildSingle
 {
-	$projectName= $args[0];
-	$buildDay=[DateTime]::Now.ToString("yyMMdd")
-	$env:FFmpegArgsBuild=$buildDay
+	# NuGet pack/push is only allowed on the 'master' branch.
+	if (-not (Assert-MasterBranch)) { pause; return }
 
+	$projectName= $args[0];
+
+	# Version is resolved by GitVersion (no manual build-date suffix anymore).
 	$result = NugetPack $projectName
 	if($result)
     {
