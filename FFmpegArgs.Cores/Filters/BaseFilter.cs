@@ -66,7 +66,7 @@
         public string GetFilterValue()
         {
             if (string.IsNullOrEmpty(FilterName)) throw new NullReferenceException(nameof(FilterName));
-            if (_mapsOut.Count == 0) throw new NullReferenceException($"{FilterName} is empty output");
+            if (!AllowNoMapOut && _mapsOut.Count == 0) throw new NullReferenceException($"{FilterName} is empty output");
             string inputs = string.Join("", _mapsIn.Where(x => !string.IsNullOrWhiteSpace(x.MapName)).Select(x => $"[{x.MapName}]"));
             string outputs = string.Join("", _mapsOut.Select(x => $"[{x.MapName}]"));
             string options = GetFilterOptions();
@@ -84,7 +84,13 @@
         }
 
         /// <summary>
-        /// 
+        /// Sink filter (vd nullsink/buffersink) khong co map out. Override tra ve true
+        /// de cho phep filter co 0 map out (khong nem loi "empty output").
+        /// </summary>
+        protected virtual bool AllowNoMapOut => false;
+
+        /// <summary>
+        ///
         /// </summary>
         protected abstract void AddMapOut();
 
