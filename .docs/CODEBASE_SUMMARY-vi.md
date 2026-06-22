@@ -90,6 +90,7 @@ BaseOption (Options: Dictionary<key,val>)          -> ../FFmpegArgs.Cores/BaseOp
 2. `GetFilterValue()` sinh `[in1][in2]name=opt1=val1:opt2=val2[out1]` — giá trị một filter.
 3. Khi build, `FilterGraph.GetFiltersArgs()`:
    - Kiểm tra không còn map nào "treo" (chưa map vào đâu) → ném lỗi nếu có.
+   - Cờ `AutoSinkUnusedMapOut` (mặc định `false`): nếu bật, mọi map out chưa dùng được tự gắn sink (`nullsink`/`anullsink` theo kiểu map qua [AutoSinkFilter](../FFmpegArgs.Cores/Filters/AutoSinkFilter.cs)) thay vì ném lỗi "treo". Output thật (đã map ra stream) không bao giờ bị sink; việc bảo đảm command có ≥1 output do `FFmpegArg.GetOutputsArgs` lo (ném "Output is empty").
    - **useChain=true** (mặc định): [FilterChain.BuildChains](../FFmpegArgs.Cores/Filters/FilterChain.cs) gộp các filter nối tiếp 1-vào-1-ra thành chuỗi `f1,f2,f3` để rút gọn; nối các chuỗi bằng `;`.
    - **useChain=false**: mỗi filter là một mệnh đề riêng, nối bằng `;`.
 4. **Escaping 2 cấp** tại [FilterExtensions.cs](../FFmpegArgs.Cores/Extensions/FilterExtensions.cs): Lv1 (giá trị option) + Lv2 (mức filter). *(Lv3 — mức argument — còn bỏ ngỏ, đang comment.)*
