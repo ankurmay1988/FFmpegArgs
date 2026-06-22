@@ -75,7 +75,7 @@
 - Lưu ý: delete-loop [FiltersGen.cs:39-42](../Autogens/Filter/FiltersGen.cs#L39-L42) đang comment → filter bị gỡ sẽ để lại `.g.cs` cũ (không bật lại khi không giám sát).
 
 ### T3 — P4 còn lại (mỗi mục 1 task riêng, ưu tiên rủi ro thấp trước)
-- **T3a** `-hwaccel`/`-hwaccel_device`/`-hwaccel_output_format`/`-init_hw_device`/`-filter_hw_device` (additive extension input+global). Điều tra (không trùng) filter `hwupload`/`hwdownload` đã auto-gen. Test arg-build. **AN TOÀN — ưu tiên.** · trạng thái: 🔄
+- **T3a** `-hwaccel`/`-hwaccel_device`/`-hwaccel_output_format`/`-init_hw_device`/`-filter_hw_device` (additive extension input+global). Điều tra (không trùng) filter `hwupload`/`hwdownload` đã auto-gen. Test arg-build. **AN TOÀN — ưu tiên.** · trạng thái: ✅ (commit `aeb2aad`, 70/70)
 - **T3b** Validate đồ thị mạnh hơn (map dùng 2 lần, lệch kiểu, sink/source). **RỦI RO TRUNG BÌNH** (đụng core BaseFilter/FilterChain/map — có thể đổi hành vi throw). Chỉ làm kiểu **opt-in additive**, KHÔNG đổi throw hiện có; nếu phải đổi core → ⏭️ defer cho có giám sát. · trạng thái: ⬜
 - **T3c** Autogen → Roslyn Source Generator. **⏭️ DEFER** (đại tu kiến trúc, cần giám sát). · trạng thái: ⏭️
 - **T3d** AOT/trim friendly. **⏭️ DEFER** (cross-cutting, cần phân tích reflection toàn repo). · trạng thái: ⏭️
@@ -83,6 +83,8 @@
 
 ## 5. Nhật ký iteration (append-only, mới nhất ở trên)
 
+- `STOP đêm` — Phiên chính (chủ máy ngủ) dừng tại đây sau T1/T2/T3a. Còn lại cho **cron 6:53 sáng (job e945c43a)**: **T3b** (validate đồ thị — chỉ làm opt-in additive, KHÔNG đổi throw core; rủi ro → defer). T3c/d/e đã defer (architectural/design-heavy, cần giám sát). T2b defer (architectural). Branch `auto/overnight-roadmap` đỉnh `aeb2aad`, chưa push/tag.
+- `T3a ✅` — hwaccel options. Input ext (`-hwaccel`/`-hwaccel_device`/`-hwaccel_output_format`, `where T:BaseInput`) trong `InputOutputOptionsExtension.cs` cạnh `Re()`; global (`-init_hw_device`/`-filter_hw_device`) trong `Globals\AdvancedGlobalOptionsExtension.cs` (đã có stub TODO sẵn); enum `HardwareAccel` (12 method) trong `FFmpegArgs.Cores\Enums`. `hwupload` đã auto-gen (không trùng); `hwdownload`/`hwmap`/`hwupload_cuda` chưa gen (ngoài scope). Build 0 error; **70/70 test** (62+8). Commit `aeb2aad` (4 files, +275).
 - `T2 ✅ (no-op)` — Điều tra "làm giàu filter". Baseline regen 8.0.1 = 0 diff. T2a bất khả thi (8.0.1 `-filters` không còn cột cờ `C`), T2c đã làm sẵn (ExpressionValue heuristic), T2b hoãn (architectural). KHÔNG sửa code — đúng directive "không thay đổi cũng chấp nhận được". Tree sạch tại `4a8b177`. T3: tách rủi ro → T3a hwaccel (làm), T3b validate (opt-in/defer), T3c/d/e defer. Tiếp theo: T3a.
 - `T1 ✅` — ffprobe wrapper. Tạo project `FFprobeArgs` self-contained (FFprobeArg token-list + FFprobePrintFormat + FFprobeRender/Config/Result/Extensions + model JSON tối thiểu), đăng ký vào `FFmpegArgs.sln` (GUID mới), thêm ProjectReference + `FFprobeArgTest.cs` (9 test) vào `FFmpegArgs.Test`. Build solution 0 error; **62/62 test pass** (53 baseline + 9). Commit `deefb99` (14 files). FFprobeRender ĐÃ gồm (parse JSON qua System.Text.Json, netstandard2.0 thêm package có điều kiện). Chưa thêm execute-test vào `FFmpegArgs.Test.Render` (follow-up tuỳ chọn). Tiếp theo: T2 (làm giàu filter).
 - `INIT` — Tạo branch `auto/overnight-roadmap` từ `dev` (đỉnh `e4f2637`). Viết tracker này. Baseline: FFmpegArgs.Test 53/53. Tiếp theo: T1 (ffprobe).
