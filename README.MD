@@ -7,6 +7,7 @@ Get it on [NuGet Package](https://www.nuget.org/packages?q=FFmpegArgs)
 ________________________________________  
 - Support file/url/pipe in/output.
 - Works on most systems - if ffmpeg can execution.
+- Generated & tested against **ffmpeg n8.0.1** (recommend ffmpeg ≥ 8.0)
 - 130+ filters, add more in future 
 - 380+ filters auto-generate
 

@@ -126,7 +126,7 @@ public static class ScaleFilterExtension {
 → Người dùng gọi `map.ScaleFilter().W("iw/3").H("ih/3").MapOut` (lấy map đầu ra), hoặc `.SplitFilter(2).MapsOut` (nhiều đầu ra).
 
 ### 4.2 Filter auto-generate
-- Project [Autogens](../Autogens/Program.cs) đọc output của `ffmpeg -filters` và `ffmpeg -h full` (bản backup lưu ở [.other/](../.other/)), dùng **Roslyn** (`Microsoft.CodeAnalysis.CSharp`) sinh ra 470 file `.g.cs` vào [FFmpegArgs.Filters.Generated/Gen/](../FFmpegArgs.Filters.Generated/Gen/).
+- Project [Autogens](../Autogens/Program.cs) chạy **LIVE** `ffmpeg -filters` / `-h full` / `-formats` / `-codecs` từ `ffmpeg.exe` trên PATH (KHÔNG đọc `.other/` — đó chỉ là snapshot backup, hiện là **ffmpeg n8.0.1-48-g0592be14ff**), dùng **Roslyn** (`Microsoft.CodeAnalysis.CSharp`) sinh 470 file `.g.cs` vào [FFmpegArgs.Filters.Generated/Gen/](../FFmpegArgs.Filters.Generated/Gen/) + 3 enum `Codecs`/`DemuxingFileFormat`/`MuxingFileFormat` vào [FFmpegArgs.Cores/Enums/](../FFmpegArgs.Cores/Enums/). Regen phải chạy với **CWD = gốc repo** (generator dùng đường dẫn tương đối).
 - Generated khác filter viết tay: **chỉ có option cơ bản**, không có validate expression, ít interface, doc lấy từ help text. Ví dụ [HflipFilterGen.g.cs](../FFmpegArgs.Filters.Generated/Gen/HflipFilterGen.g.cs).
 - Logic sinh: [FiltersGen.cs](../Autogens/Filter/FiltersGen.cs); danh sách filter **bị bỏ qua** (loại `N->N`, `|->N`, thiếu doc) ghi tại `.other/NotAutoGen_window.txt`.
 
@@ -211,4 +211,5 @@ Mỗi encoder phơi bày enum preset/tune/profile/rate-control... dưới dạng
 - **Subtitle**: `-c:s` (`Scodec`/`CopySubtitle`) + `-sub_charenc` ([SubtitleAVStreamOptionsExtension.cs](../FFmpegArgs.Extensions/StreamSpecifiers/SubtitleAVStreamOptionsExtension.cs)); burn-in (`subtitles`/`ass`) đã có sẵn.
 - **Culture**: (1) [BaseOption.cs](../FFmpegArgs.Cores/BaseOption.cs) format số bằng `InvariantCulture` (định tuyến `SetOptionRange`/`SetOption(object)` qua `IFormattable`); (2) Turkish-i: bỏ `enum.ToString().ToLower()` ở filter, dùng `[Name(...)]` + `GetEnumAttribute` (vd `FadeType.In`→`in` chứ không `ın`); Autogens helper dùng `ToUpperInvariant`. Sửa HẸP, **không** lặp lại commit #7 (đã revert).
 - **Tài liệu**: [EXAMPLES.md](EXAMPLES.md) ví dụ theo nhóm tính năng.
-- **HOÃN** (rủi ro khi không giám sát): làm giàu filter generated, đồng bộ ffmpeg version (regen → diff lớn); subtitle stream/map đầy đủ; `.snupkg` thật (cần migrate SDK-pack).
+- **Đồng bộ ffmpeg version**: đã regen lên **ffmpeg n8.0.1** (0 enum đổi; 2 filter `.g.cs` sửa mojibake µ/°); dump `.other/` cập nhật theo.
+- **HOÃN** (rủi ro khi không giám sát): làm giàu filter generated; subtitle stream/map đầy đủ; `.snupkg` thật (cần migrate SDK-pack).
