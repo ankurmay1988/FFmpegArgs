@@ -186,4 +186,4 @@ Mỗi encoder phơi bày enum preset/tune/profile/rate-control... dưới dạng
 | 7 | Escaping Lv3 (mức argument) chưa làm | Bỏ ngỏ | [FilterExtensions.cs](../FFmpegArgs.Cores/Extensions/FilterExtensions.cs) |
 | 8 | Test phụ thuộc nhiều vào ffmpeg thật + media cục bộ | Khó CI | [FFmpegArgs.Test/](../FFmpegArgs.Test/) |
 
-> Kế hoạch xử lý các mục này nằm ở [ROADMAP.md](ROADMAP.md).
+> Kế hoạch xử lý các mục này nằm ở [ROADMAP-vi.md](ROADMAP-vi.md).

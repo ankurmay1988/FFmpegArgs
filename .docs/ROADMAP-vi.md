@@ -1,6 +1,6 @@
 # FFmpegArgs — Roadmap phát triển
 
-> Đề xuất kế hoạch phát triển dựa trên hiện trạng codebase (xem [CODEBASE_SUMMARY.md](CODEBASE_SUMMARY.md)).
+> Đề xuất kế hoạch phát triển dựa trên hiện trạng codebase (xem [CODEBASE_SUMMARY-vi.md](CODEBASE_SUMMARY-vi.md)).
 > Phiên bản hiện tại: **2.2**. Đây là *đề xuất* — thứ tự ưu tiên có thể điều chỉnh theo nhu cầu thực tế.
 > Quy ước: **P0** = sửa gấp · **P1** = hoàn thiện tính năng dở · **P2** = mở rộng độ phủ · **P3** = chất lượng & hạ tầng · **P4** = nâng cao.
 
@@ -75,4 +75,4 @@
 2. **Ưu tiên auto-generate** cho filter đơn giản; chỉ viết tay khi cần expression/validate/nhiều overload.
 3. **Mỗi tính năng kèm test build-args** (không cần ffmpeg) để chạy được trên CI.
 4. **Tôn trọng multi-target** netstandard2.0 (tránh API chỉ có ở net mới mà không guard `#if`).
-5. **Cập nhật [CODEBASE_SUMMARY.md](CODEBASE_SUMMARY.md)** khi thêm project/đổi kiến trúc.
+5. **Cập nhật [CODEBASE_SUMMARY-vi.md](CODEBASE_SUMMARY-vi.md)** khi thêm project/đổi kiến trúc.
