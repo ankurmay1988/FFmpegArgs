@@ -131,7 +131,7 @@ namespace FFmpegArgs.Filters.AudioFilters
         /// <param name="mode"></param>
         /// <returns></returns>
         public AdynamicequalizerFilter Mode(AdynamicequalizerMode mode)
-          => this.SetOption("mode", mode.ToString().ToLower());
+          => this.SetOption("mode", mode.GetEnumAttribute<NameAttribute>().Name);
     }
     /// <summary>
     /// 
@@ -148,9 +148,9 @@ namespace FFmpegArgs.Filters.AudioFilters
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
     public enum AdynamicequalizerMode
     {
-        Listen,
-        Cut,
-        Boost,
+        [Name("listen")] Listen,
+        [Name("cut")] Cut,
+        [Name("boost")] Boost,
     }
 #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
 }

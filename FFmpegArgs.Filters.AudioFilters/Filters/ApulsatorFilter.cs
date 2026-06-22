@@ -55,7 +55,7 @@ namespace FFmpegArgs.Filters.AudioFilters
         /// <param name="mode"></param>
         /// <returns></returns>
         public ApulsatorFilter Mode(ApulsatorMode mode)
-            => this.SetOption("mode", mode.ToString().ToLower());
+            => this.SetOption("mode", mode.GetEnumAttribute<NameAttribute>().Name);
 
         /// <summary>
         /// set modulation (from 0 to 1) (default 1)
@@ -95,7 +95,7 @@ namespace FFmpegArgs.Filters.AudioFilters
         /// <param name="timing"></param>
         /// <returns></returns>
         public ApulsatorFilter Timing(ApulsatorMode timing)
-            => this.SetOption("timing", timing.ToString().ToLower());
+            => this.SetOption("timing", timing.GetEnumAttribute<NameAttribute>().Name);
 
         /// <summary>
         /// set BPM (from 30 to 300) (default 120)
@@ -141,23 +141,23 @@ namespace FFmpegArgs.Filters.AudioFilters
         /// <summary>
         /// 
         /// </summary>
-        Sine = 0,
+        [Name("sine")] Sine = 0,
         /// <summary>
-        /// 
+        ///
         /// </summary>
-        Triangle = 1,
+        [Name("triangle")] Triangle = 1,
         /// <summary>
-        /// 
+        ///
         /// </summary>
-        Square = 2,
+        [Name("square")] Square = 2,
         /// <summary>
-        /// 
+        ///
         /// </summary>
-        Sawup = 3,
+        [Name("sawup")] Sawup = 3,
         /// <summary>
-        /// 
+        ///
         /// </summary>
-        Sawdown = 4
+        [Name("sawdown")] Sawdown = 4
     }
 
     /// <summary>

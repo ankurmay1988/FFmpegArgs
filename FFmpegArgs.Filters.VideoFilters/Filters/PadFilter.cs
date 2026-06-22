@@ -79,7 +79,7 @@ namespace FFmpegArgs.Filters.VideoFilters
         /// <param name="eval"></param>
         /// <returns></returns>
         public PadFilter Eval(PadEval eval)
-          => this.SetOption("eval", eval.ToString().ToLower());
+          => this.SetOption("eval", eval.GetEnumAttribute<NameAttribute>().Name);
         /// <summary>
         /// Pad to aspect instead to a resolution.
         /// </summary>
@@ -105,12 +105,12 @@ namespace FFmpegArgs.Filters.VideoFilters
     public enum PadEval
     {
         /// <summary>
-        /// 
+        ///
         /// </summary>
-        Init,
+        [Name("init")] Init,
         /// <summary>
-        /// 
+        ///
         /// </summary>
-        Frame
+        [Name("frame")] Frame
     }
 }

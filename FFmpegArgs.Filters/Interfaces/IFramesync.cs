@@ -21,7 +21,7 @@
         /// <returns></returns>
         public static T EofAction<T>(this T filter, EofAction action)
             where T : BaseOption, IFilter<BaseMap, BaseMap>, IFramesync
-          => filter.SetOption("eof_action", action.ToString().ToLower());
+          => filter.SetOption("eof_action", action.GetEnumAttribute<NameAttribute>().Name);
         /// <summary>
         /// If set to 1, force the output to terminate when the shortest input terminates. Default value is 0.
         /// </summary>
@@ -52,14 +52,14 @@
         /// <summary>
         /// Repeat the last frame (the default).
         /// </summary>
-        Repeat,
+        [Name("repeat")] Repeat,
         /// <summary>
         /// End both streams.
         /// </summary>
-        EndAll,
+        [Name("endall")] EndAll,
         /// <summary>
         /// Pass the main input through.
         /// </summary>
-        Pass
+        [Name("pass")] Pass
     }
 }
