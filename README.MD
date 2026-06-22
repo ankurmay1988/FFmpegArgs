@@ -3,6 +3,7 @@
 The standout feature that many cli-wrapper libraries don't have is the **FFmpeg FilterGraph** system.
 
 Get it on [NuGet Package](https://www.nuget.org/packages?q=FFmpegArgs)  
+📖 Examples grouped by feature: [.docs/EXAMPLES.md](.docs/EXAMPLES.md)  
 ________________________________________  
 - Support file/url/pipe in/output.
 - Works on most systems - if ffmpeg can execution.
