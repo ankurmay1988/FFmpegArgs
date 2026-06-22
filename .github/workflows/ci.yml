@@ -1,0 +1,50 @@
+name: CI
+
+# Build + chay unit test KHONG phu thuoc ffmpeg (project FFmpegArgs.Test).
+# Cac test can ffmpeg/media nam o FFmpegArgs.Test.Render va KHONG chay tren CI.
+
+on:
+  push:
+    branches:
+      - master
+      - main
+      - dev
+      - 'v*/master'
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build-test:
+    name: Build & Test (no ffmpeg)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      # EnableGitVersion=false: CI khong pack nen khong can GitVersion
+      # (tranh phai fetch full git history va restore GitVersion.MsBuild).
+      - name: Restore
+        run: dotnet restore FFmpegArgs.Test/FFmpegArgs.Test.csproj -p:EnableGitVersion=false
+
+      - name: Build
+        run: dotnet build FFmpegArgs.Test/FFmpegArgs.Test.csproj -c Release --no-restore -p:EnableGitVersion=false
+
+      - name: Test
+        run: >
+          dotnet test FFmpegArgs.Test/FFmpegArgs.Test.csproj
+          -c Release --no-build -p:EnableGitVersion=false
+          --logger "trx;LogFileName=test-results.trx"
+          --results-directory TestResults
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: TestResults/**/*.trx
+          if-no-files-found: ignore
