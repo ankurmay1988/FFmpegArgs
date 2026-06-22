@@ -51,7 +51,7 @@ File giải pháp: [FFmpegArgs.sln](../FFmpegArgs.sln)
 | **ffplay** | `FFplayArgs` | Wrapper `ffplay` — **sơ khai** (chỉ sinh args, chưa có execute). |
 | **Công cụ** | `Autogens` | Console app (net8.0) sinh code: filter `.g.cs`, enum Codecs/Demuxer/Muxer. |
 | **Test** | `FFmpegArgs.Test` | MSTest (net8.0) — **không cần ffmpeg**, chỉ dựng & kiểm tra chuỗi argument. Chạy trên CI. |
-| | `FFmpegArgs.Test.Render` | MSTest (net8.0) — **cần ffmpeg + media** (Pipe, AVStreamOption, DrawText, slideshow). Không chạy CI; define `Render` ở Debug để thực thi ffmpeg. |
+| | `FFmpegArgs.Test.Render` | MSTest (net8.0) — **cần ffmpeg + media** (FFmpegArg, Pipe, AVStreamOption, DrawText, slideshow). Không chạy CI; define `Render` ở Debug để thực thi ffmpeg. |
 
 ---
 
@@ -171,7 +171,7 @@ Mỗi encoder phơi bày enum preset/tune/profile/rate-control... dưới dạng
   - Đóng gói kèm `.dll/.pdb/.xml` + README; **chưa** có symbol package `.snupkg`.
 - **Test** (2 project, MSTest net8.0):
   - [FFmpegArgs.Test/](../FFmpegArgs.Test/) — **không phụ thuộc ffmpeg**, chỉ dựng & kiểm tra chuỗi argument (build-args [BuildTest/](../FFmpegArgs.Test/BuildTest/), feature [FeatureTest/](../FFmpegArgs.Test/FeatureTest/): Expression/Rational, codec, render-progress, escaping...). Chạy được trên CI, không cần `ffmpeg`/media.
-  - [FFmpegArgs.Test.Render/](../FFmpegArgs.Test.Render/) — **integration cần ffmpeg + media** (`PipeTest`, `AVStreamOptionTest`, `DrawTextTest`, [TanersenerSlideShow/](../FFmpegArgs.Test.Render/TanersenerSlideShow/) + [Resources/](../FFmpegArgs.Test.Render/Resources/)). Define `Render` ở Debug để thực thi ffmpeg; không chạy trên CI.
+  - [FFmpegArgs.Test.Render/](../FFmpegArgs.Test.Render/) — **integration cần ffmpeg + media** (`FFmpegArgTest`, `PipeTest`, `AVStreamOptionTest`, `DrawTextTest`, [TanersenerSlideShow/](../FFmpegArgs.Test.Render/TanersenerSlideShow/) + [Resources/](../FFmpegArgs.Test.Render/Resources/)). Define `Render` ở Debug để thực thi ffmpeg; không chạy trên CI.
 - **CI** ([.github/workflows/ci.yml](../.github/workflows/ci.yml)): build + chạy `FFmpegArgs.Test` trên `ubuntu-latest` (.NET 8), `-p:EnableGitVersion=false`.
 - **Quy ước code** [.editorconfig](../.editorconfig): C# 12, PascalCase, interface prefix `I`, namespace block-scoped, CRLF, indent 4.
 
