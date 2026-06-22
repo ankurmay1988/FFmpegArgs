@@ -184,11 +184,27 @@ Mỗi encoder phơi bày enum preset/tune/profile/rate-control... dưới dạng
 |---|----------|-----------|--------|
 | 1 | ~~`FFplayArg.GetFullCommandlineWithFilterScript` dùng `"filter_complex_script"` **thiếu dấu `-`**~~ | **Đã sửa**: thêm `-` + test chống tái phát | [FFplayArg.cs:152](../FFplayArgs/FFplayArg.cs#L152), [FFplayArgTest.cs](../FFmpegArgs.Test/FFplayArgTest.cs) |
 | 2 | ~~Video/Audio **Sinks** comment toàn bộ~~ | **Đã làm**: `AllowNoMapOut` + base sink + 4 sink filter + test | [SinkFilterTest.cs](../FFmpegArgs.Test/SinkFilterTest.cs) |
-| 3 | `FilterStringInput` (lavfi) comment toàn bộ | Chưa hoàn thiện | [FilterStringInput.cs](../FFmpegArgs.Inputs/FilterStringInput.cs) |
-| 4 | `FFplayArgs` không có lớp execute (chỉ sinh args) | Sơ khai | [FFplayArgs/](../FFplayArgs/) |
-| 5 | `Inputs.Demuxers` / `Outputs.Muxers` trống (chưa có option class đặc thù) | Khung rỗng | — |
-| 6 | Filter generated thiếu expression/timeline/validate; loại `N->N`, `|->N` bị bỏ qua | Hạn chế độ phủ | `.other/NotAutoGen_window.txt` |
+| 3 | ~~`FilterStringInput` (lavfi) comment toàn bộ~~ | **Đã làm**: kích hoạt lại (token RAW) + test | [FilterStringInput.cs](../FFmpegArgs.Inputs/FilterStringInput.cs) |
+| 4 | ~~`FFplayArgs` không có lớp execute (chỉ sinh args)~~ | **Đã làm**: `FFplayRender` self-contained + cancel + test | [FFplayArgs/](../FFplayArgs/) |
+| 5 | `Inputs.Demuxers` / `Outputs.Muxers` **đã bị gỡ khỏi solution** (chỉ còn `obj` rỗng) | Option muxer/demuxer chuyển sang extension | [MuxerDemuxerOptionsExtension.cs](../FFmpegArgs.Extensions/MuxerDemuxerOptionsExtension.cs) |
+| 6 | Filter generated thiếu expression/timeline/validate; loại `N->N`, `|->N` bị bỏ qua | Hạn chế độ phủ (**HOÃN** regen) | `.other/NotAutoGen_window.txt` |
 | 7 | Escaping Lv3 (mức process arg/shell) | **Giữ stub** (không cần do thực thi qua `ArgumentList`, không qua shell) | [FilterExtensions.cs](../FFmpegArgs.Cores/Extensions/FilterExtensions.cs) |
 | 8 | ~~Test phụ thuộc nhiều vào ffmpeg thật + media cục bộ~~ | **Đã xử lý**: tách [FFmpegArgs.Test/](../FFmpegArgs.Test/) (no-ffmpeg, CI) và [FFmpegArgs.Test.Render/](../FFmpegArgs.Test.Render/) (cần ffmpeg) | [ci.yml](../.github/workflows/ci.yml) |
 
 > Kế hoạch xử lý các mục này nằm ở [ROADMAP-vi.md](ROADMAP-vi.md).
+
+---
+
+## 10. Cập nhật v2.4–v2.5 (đợt mở rộng roadmap)
+
+- **Symbol/source debug** ([ProjectBuildProperties.targets](../ProjectBuildProperties.targets)): `DebugType=embedded` + `EmbedAllSources` + `Microsoft.SourceLink.GitHub`; 20 nuspec bỏ pack `.pdb` rời. Không dùng `.snupkg` thật được do pack qua custom `<NuspecFile>` (SDK bỏ qua symbol package).
+- **lavfi input** `FilterStringInput` (`-f lavfi -i`) — token RAW (không tự bọc `"`).
+- **Execute ffplay**: `FFplayRender`/`FFplayRenderConfig`/`FFplayRenderResult` + `Render(this FFplayArg)` **self-contained** trong [FFplayArgs/](../FFplayArgs/) (không reference Executes → package decoupled).
+- **Cancel**: xác nhận `FFmpegRender` kill process khi cancel (`token.Register(Kill)`) + render test timeout.
+- **Audio encoders** (tag `v2.4.0`): 8 lớp [Encoders/Audios/](../FFmpegArgs.Codec/Encoders/Audios/) (aac/libmp3lame/ac3/eac3/flac/alac/libopus/libvorbis), selector `-c:a:0 <name>`.
+- **Muxer/demuxer options** [MuxerDemuxerOptionsExtension.cs](../FFmpegArgs.Extensions/MuxerDemuxerOptionsExtension.cs): `-movflags` (enum `MovFlag`), `-re`, image2 `-start_number`/`-pattern_type`.
+- **Subtitle**: `-c:s` (`Scodec`/`CopySubtitle`) + `-sub_charenc` ([SubtitleAVStreamOptionsExtension.cs](../FFmpegArgs.Extensions/StreamSpecifiers/SubtitleAVStreamOptionsExtension.cs)); burn-in (`subtitles`/`ass`) đã có sẵn.
+- **Culture** (tag `v2.5.0`): [BaseOption.cs](../FFmpegArgs.Cores/BaseOption.cs) format số bằng `InvariantCulture` (định tuyến `SetOptionRange`/`SetOption(object)` qua `IFormattable`). Sửa HẸP, **không** lặp lại commit #7 (đã revert).
+- **Tài liệu**: [EXAMPLES.md](EXAMPLES.md) ví dụ theo nhóm tính năng.
+- **Quy tắc tag**: `v2.4.0` @ commit feat audio encoder đầu; `v2.5.0` @ commit Culture (gắn vào commit ĐẦU của tính năng, patch = commits-since-tag).
+- **HOÃN** (rủi ro khi không giám sát): làm giàu filter generated, đồng bộ ffmpeg version (regen → diff lớn); subtitle stream/map đầy đủ; `.snupkg` thật (cần migrate SDK-pack).
