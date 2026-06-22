@@ -20,8 +20,8 @@
 
 ## P0 — Sửa lỗi gấp (patch 2.2.x)
 
-- [ ] **Sửa bug FFplay**: [FFplayArg.cs:152](../FFplayArgs/FFplayArg.cs#L152) đang dùng `"filter_complex_script"` thiếu dấu `-`, phải là `"-filter_complex_script"` (đối chiếu [FFmpegArg.cs:226](../FFmpegArgs/FFmpegArg.cs#L226)). Thêm test chống tái phát.
-- [ ] **Rà soát escaping**: bổ sung test cho ký tự đặc biệt (`'`, `:`, `\`, `[]`, `,`, `;`) trong [FilterExtensions.cs](../FFmpegArgs.Cores/Extensions/FilterExtensions.cs); quyết định có cần hoàn thiện `FiltergraphEscapingLv3` (mức argument) hay xóa hẳn.
+- [x] **Sửa bug FFplay** (đã làm): [FFplayArg.cs:152](../FFplayArgs/FFplayArg.cs#L152) sửa `"filter_complex_script"` → `"-filter_complex_script"` (đồng bộ [FFmpegArg.cs:226](../FFmpegArgs/FFmpegArg.cs#L226)); thêm test chống tái phát `TestFilterComplexScriptArgHasLeadingDash` trong [FFplayArgTest.cs](../FFmpegArgs.Test/FFplayArgTest.cs) (không cần ffmpeg, chạy trên CI).
+- [x] **Rà soát escaping** (đã làm): **giữ lại** stub `FiltergraphEscapingLv3` (mức process arg) cho tương lai — hiện chưa cần vì thực thi qua `ProcessStartInfo.ArgumentList` (`UseShellExecute=false`, [FFmpegRender.cs:54-61](../FFmpegArgs.Executes/FFmpegRender.cs#L54-L61)) nên không có "tầng shell" để escape; filtergraph chỉ cần Lv1 (token) + Lv2 (filter) như ffmpeg docs (dùng tại [BaseFilter.cs:83](../FFmpegArgs.Cores/Filters/BaseFilter.cs#L83)). Còn lại (tùy chọn): bổ sung test assert chuỗi escaped Lv1/Lv2 — hiện [TestStringEscape](../FFmpegArgs.Test/FFplayArgTest.cs) mới chỉ build chứ chưa assert.
 
 ---
 
