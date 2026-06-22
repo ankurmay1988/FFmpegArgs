@@ -19,9 +19,9 @@
     }
     public static partial class DemuxerExtensions
     {
-        public static DashDemuxer DashDemuxer<TInput>(this TInput input) where TInput : BaseInput, IImageInput
+        public static DashDemuxer DashDemux<TInput>(this TInput input) where TInput : BaseInput, IImageInput
           => new DashDemuxer(input);
-        public static TInput DashDemuxer<TInput>(this TInput input, Action<DashDemuxer> action) where TInput : BaseInput, IImageInput
+        public static TInput DashDemux<TInput>(this TInput input, Action<DashDemuxer> action) where TInput : BaseInput, IImageInput
         {
             if (action is null) throw new ArgumentNullException(nameof(action));
             DashDemuxer dashDemuxer = new DashDemuxer(input);

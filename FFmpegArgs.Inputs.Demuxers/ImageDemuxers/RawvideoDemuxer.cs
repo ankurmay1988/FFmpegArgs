@@ -29,10 +29,10 @@
     }
     public static partial class DemuxerExtensions
     {
-        public static RawvideoDemuxer RawvideoDemuxer<TInput>(this TInput input) where TInput : BaseInput, IImageInput
+        public static RawvideoDemuxer RawvideoDemux<TInput>(this TInput input) where TInput : BaseInput, IImageInput
           => new RawvideoDemuxer(input);
 
-        public static TInput RawvideoDemuxer<TInput>(this TInput input, Action<RawvideoDemuxer> action) where TInput : BaseInput, IImageInput
+        public static TInput RawvideoDemux<TInput>(this TInput input, Action<RawvideoDemuxer> action) where TInput : BaseInput, IImageInput
         {
             if (action is null) throw new ArgumentNullException(nameof(action));
             RawvideoDemuxer rawvideoDemuxer = new RawvideoDemuxer(input);
