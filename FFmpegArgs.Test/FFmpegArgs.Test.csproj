@@ -47,6 +47,7 @@
 		<ProjectReference Include="..\FFmpegArgs.Outputs.Muxers\FFmpegArgs.Outputs.Muxers.csproj" />
 		<ProjectReference Include="..\FFmpegArgs\FFmpegArgs.csproj" />
 		<ProjectReference Include="..\FFplayArgs\FFplayArgs.csproj" />
+		<ProjectReference Include="..\FFprobeArgs\FFprobeArgs.csproj" />
 	</ItemGroup>
 
 </Project>
