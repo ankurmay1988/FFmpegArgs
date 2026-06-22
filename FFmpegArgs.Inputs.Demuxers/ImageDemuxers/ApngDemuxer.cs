@@ -29,14 +29,14 @@
     }
     public static partial class DemuxerExtensions
     {
-        public static ApngDemuxer ApngDemuxer<TInput>(this TInput input) where TInput : BaseInput, IImageInput
+        public static ApngDemuxer ApngDemux<TInput>(this TInput input) where TInput : BaseInput, IImageInput
           => new ApngDemuxer(input);
 
-        public static TInput ApngDemuxer<TInput>(this TInput input, Action<ApngDemuxer> action) where TInput : BaseInput, IImageInput
+        public static TInput ApngDemux<TInput>(this TInput input, Action<ApngDemuxer> action) where TInput : BaseInput, IImageInput
         {
             if (action is null) throw new ArgumentNullException(nameof(action));
-            ApngDemuxer rawvideoDemuxer = new ApngDemuxer(input);
-            action.Invoke(rawvideoDemuxer);
+            ApngDemuxer apngDemuxer = new ApngDemuxer(input);
+            action.Invoke(apngDemuxer);
             return input;
         }
     }

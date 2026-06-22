@@ -20,9 +20,9 @@
     }
     public static partial class DemuxerExtensions
     {
-        public static AsfDemuxer AsfDemuxer<TInput>(this TInput input) where TInput : BaseInput, IImageInput
+        public static AsfDemuxer AsfDemux<TInput>(this TInput input) where TInput : BaseInput, IImageInput
           => new AsfDemuxer(input);
-        public static TInput AsfDemuxer<TInput>(this TInput input, Action<AsfDemuxer> action) where TInput : BaseInput, IImageInput
+        public static TInput AsfDemux<TInput>(this TInput input, Action<AsfDemuxer> action) where TInput : BaseInput, IImageInput
         {
             if (action is null) throw new ArgumentNullException(nameof(action));
             AsfDemuxer asfDemuxer = new AsfDemuxer(input);
