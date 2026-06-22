@@ -51,7 +51,7 @@
 
 > Trạng thái: `⬜ pending` · `🔄 in-progress` · `✅ done` · `⛔ blocked` · `⏭️ deferred`
 
-### T1 — P4: ffprobe wrapper `FFprobeArgs`  · trạng thái: ⬜
+### T1 — P4: ffprobe wrapper `FFprobeArgs`  · trạng thái: ✅ (commit `deefb99`)
 - Project mới `FFprobeArgs`, **mirror cấu trúc & convention của `FFplayArgs`** (multi-target, csproj props, self-contained — KHÔNG reference `FFmpegArgs.Executes`).
 - `FFprobeArg`: dựng token-list argument (giống `FFplayArg.GetAllArgs()`). Hỗ trợ tối thiểu: input (`-i`/positional), `-hide_banner`, `-v/-loglevel`, `-print_format`/`-of` (json/xml/csv/flat/ini/default), `-show_format`, `-show_streams`, `-show_packets`, `-show_frames`, `-select_streams <spec>`, `-show_entries <...>`, `-count_frames`/`-count_packets`. Fluent extension methods cho các option phổ biến.
 - (Tuỳ chọn, nếu còn thời gian) `FFprobeRender`/`FFprobeRenderConfig`/`FFprobeRenderResult` self-contained mirror [FFmpegRender](../FFmpegArgs.Executes/FFmpegRender.cs): chạy ffprobe, lấy stdout, trả raw + parse JSON tối thiểu (model `format{duration,bit_rate,format_name}`, `streams[]{index,codec_type,codec_name,width,height,duration}`) bằng `System.Text.Json`. Test parse/execute (cần ffprobe) để ở `FFmpegArgs.Test.Render`.
@@ -76,4 +76,5 @@
 
 ## 5. Nhật ký iteration (append-only, mới nhất ở trên)
 
+- `T1 ✅` — ffprobe wrapper. Tạo project `FFprobeArgs` self-contained (FFprobeArg token-list + FFprobePrintFormat + FFprobeRender/Config/Result/Extensions + model JSON tối thiểu), đăng ký vào `FFmpegArgs.sln` (GUID mới), thêm ProjectReference + `FFprobeArgTest.cs` (9 test) vào `FFmpegArgs.Test`. Build solution 0 error; **62/62 test pass** (53 baseline + 9). Commit `deefb99` (14 files). FFprobeRender ĐÃ gồm (parse JSON qua System.Text.Json, netstandard2.0 thêm package có điều kiện). Chưa thêm execute-test vào `FFmpegArgs.Test.Render` (follow-up tuỳ chọn). Tiếp theo: T2 (làm giàu filter).
 - `INIT` — Tạo branch `auto/overnight-roadmap` từ `dev` (đỉnh `e4f2637`). Viết tracker này. Baseline: FFmpegArgs.Test 53/53. Tiếp theo: T1 (ffprobe).
