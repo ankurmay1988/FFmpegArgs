@@ -2,7 +2,7 @@
 
 > Đề xuất kế hoạch phát triển dựa trên hiện trạng codebase (xem [CODEBASE_SUMMARY-vi.md](CODEBASE_SUMMARY-vi.md)).
 > Phiên bản hiện tại: **2.2**. Đây là *đề xuất* — thứ tự ưu tiên có thể điều chỉnh theo nhu cầu thực tế.
-> Quy ước: **P0** = sửa gấp · **P1** = hoàn thiện tính năng dở · **P2** = mở rộng độ phủ · **P3** = chất lượng & hạ tầng · **P4** = nâng cao.
+> Quy ước: **P0** = sửa gấp + chất lượng & hạ tầng (đã gộp P3) · **P1** = hoàn thiện tính năng dở · **P2** = mở rộng độ phủ · **P4** = nâng cao.
 
 ---
 
@@ -10,18 +10,25 @@
 
 | Ưu tiên | Mục tiêu | Phiên bản đề xuất | Quy mô |
 |---------|----------|-------------------|--------|
-| P0 | Sửa bug `filter_complex_script` của FFplay | 2.2.x (patch) | Nhỏ |
+| P0 | Sửa bug FFplay (xong) + **chất lượng & hạ tầng gộp từ P3**: symbol package (ưu tiên 1), tài liệu, ép InvariantCulture | 2.2.x–2.5 | Vừa |
 | P1 | Hoàn thiện Sinks, FilterStringInput, execute cho FFplay | 2.3 | Vừa |
 | P2 | Mở rộng codec audio, demuxer/muxer options, subtitle, làm giàu filter generated | 2.4 | Lớn |
-| P3 | Unit test không phụ thuộc ffmpeg, CI/CD, symbol package, tài liệu | 2.4–2.5 | Vừa |
 | P4 | ffprobe wrapper, hwupload/hwdownload, source-generator hóa autogen, AOT/trim | 3.0 | Lớn |
 
 ---
 
-## P0 — Sửa lỗi gấp (patch 2.2.x)
+## P0 — Sửa gấp, chất lượng & hạ tầng (đã gộp P3, ưu tiên cao)
 
+> Gộp toàn bộ **P3 (chất lượng & hạ tầng)** vào đây theo yêu cầu. Trong nhóm còn dở, **Symbol package** được ưu tiên làm trước.
+
+- [ ] **Symbol package** (ưu tiên 1): phát hành `.snupkg` (Source Link) thay vì nhúng `.pdb`, để debug từ NuGet.
+- [ ] **Tài liệu**: trang ví dụ theo nhóm tính năng (filter graph, pipe, codec phần cứng, progress) dựa trên [README.MD](../README.MD); cân nhắc DocFX trang API.
+- [ ] **Văn hóa Culture**: README đã cảnh báo về dấu thập phân/Turkish-i; cân nhắc ép `InvariantCulture` nội bộ khi format số/enum để người dùng không phải tự `CultureScope`.
 - [x] **Sửa bug FFplay** (đã làm): [FFplayArg.cs:152](../FFplayArgs/FFplayArg.cs#L152) sửa `"filter_complex_script"` → `"-filter_complex_script"` (đồng bộ [FFmpegArg.cs:226](../FFmpegArgs/FFmpegArg.cs#L226)); thêm test chống tái phát `TestFilterComplexScriptArgHasLeadingDash` trong [FFplayArgTest.cs](../FFmpegArgs.Test/FFplayArgTest.cs) (không cần ffmpeg, chạy trên CI).
 - [x] **Rà soát escaping** (đã làm): **giữ lại** stub `FiltergraphEscapingLv3` (mức process arg) cho tương lai — hiện chưa cần vì thực thi qua `ProcessStartInfo.ArgumentList` (`UseShellExecute=false`, [FFmpegRender.cs:54-61](../FFmpegArgs.Executes/FFmpegRender.cs#L54-L61)) nên không có "tầng shell" để escape; filtergraph chỉ cần Lv1 (token) + Lv2 (filter) như ffmpeg docs (dùng tại [BaseFilter.cs:83](../FFmpegArgs.Cores/Filters/BaseFilter.cs#L83)). Còn lại (tùy chọn): bổ sung test assert chuỗi escaped Lv1/Lv2 — hiện [TestStringEscape](../FFmpegArgs.Test/FFplayArgTest.cs) mới chỉ build chứ chưa assert.
+- [x] **Tách unit test khỏi ffmpeg thật** (đã làm): tách thành 2 project — [FFmpegArgs.Test/](../FFmpegArgs.Test/) chỉ dựng & kiểm tra chuỗi argument (không chạy ffmpeg, chạy được trên CI) và [FFmpegArgs.Test.Render/](../FFmpegArgs.Test.Render/) gồm các test cần ffmpeg + media (`FFmpegArgTest`, `PipeTest`, `AVStreamOptionTest`, `DrawTextTest`, `TanersenerSlideShow`). Bỏ define `Render` ở project không-ffmpeg (đã xoá `Render.cs` bên đó).
+- [x] **CI/CD GitHub Actions** (đã làm — phần không-ffmpeg): [.github/workflows/ci.yml](../.github/workflows/ci.yml) build + chạy unit test của `FFmpegArgs.Test` trên `ubuntu-latest` (.NET 8), dùng `-p:EnableGitVersion=false`. Còn lại: matrix đa target, job tùy chọn cài ffmpeg chạy `FFmpegArgs.Test.Render`, và tự đóng gói & publish NuGet khi tag (thay [NugetAll.ps1](../NugetAll.ps1)).
+- [x] **Versioning tự động** (đã làm): GitVersion ([GitVersion.yml](../GitVersion.yml)) thay `FileVersion` thủ công + biến `$build`. Tag `vM.m.0` → package `M.m.<commits>`; script pack chỉ chạy ở `master`. Còn lại: cân nhắc tích hợp vào CI.
 
 ---
 
@@ -44,17 +51,6 @@
   - Tự gắn `ITimelineSupport`/`ICommandSupport`/`ISliceThreading` theo cờ `T/S/C` từ `ffmpeg -filters`.
   - Nhận diện tham số kiểu expression để dùng `ExpressionValue` thay vì string.
 - [ ] **Đồng bộ ffmpeg version**: cập nhật bản dump trong [.other/](../.other/) lên ffmpeg mới, chạy lại [Autogens](../Autogens/Program.cs), ghi chú ffmpeg version tối thiểu được hỗ trợ.
-
----
-
-## P3 — Chất lượng & hạ tầng (2.4–2.5)
-
-- [x] **Tách unit test khỏi ffmpeg thật** (đã làm): tách thành 2 project — [FFmpegArgs.Test/](../FFmpegArgs.Test/) chỉ dựng & kiểm tra chuỗi argument (không chạy ffmpeg, chạy được trên CI) và [FFmpegArgs.Test.Render/](../FFmpegArgs.Test.Render/) gồm các test cần ffmpeg + media (`FFmpegArgTest`, `PipeTest`, `AVStreamOptionTest`, `DrawTextTest`, `TanersenerSlideShow`). Bỏ define `Render` ở project không-ffmpeg (đã xoá `Render.cs` bên đó).
-- [x] **CI/CD GitHub Actions** (đã làm — phần không-ffmpeg): [.github/workflows/ci.yml](../.github/workflows/ci.yml) build + chạy unit test của `FFmpegArgs.Test` trên `ubuntu-latest` (.NET 8), dùng `-p:EnableGitVersion=false`. Còn lại: matrix đa target, job tùy chọn cài ffmpeg chạy `FFmpegArgs.Test.Render`, và tự đóng gói & publish NuGet khi tag (thay [NugetAll.ps1](../NugetAll.ps1)).
-- [ ] **Symbol package**: phát hành `.snupkg` (Source Link) thay vì nhúng `.pdb`, để debug từ NuGet.
-- [x] **Versioning tự động** (đã làm): GitVersion ([GitVersion.yml](../GitVersion.yml)) thay `FileVersion` thủ công + biến `$build`. Tag `vM.m.0` → package `M.m.<commits>`; script pack chỉ chạy ở `master`. Còn lại: cân nhắc tích hợp vào CI.
-- [ ] **Tài liệu**: trang ví dụ theo nhóm tính năng (filter graph, pipe, codec phần cứng, progress) dựa trên [README.MD](../README.MD); cân nhắc DocFX trang API.
-- [ ] **Văn hóa Culture**: README đã cảnh báo về dấu thập phân/Turkish-i; cân nhắc ép `InvariantCulture` nội bộ khi format số/enum để người dùng không phải tự `CultureScope`.
 
 ---
 
