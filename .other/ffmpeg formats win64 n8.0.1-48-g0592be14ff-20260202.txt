@@ -40,6 +40,7 @@ Formats:
  DE  apng            Animated Portable Network Graphics
  DE  aptx            raw aptX (Audio Processing Technology for Bluetooth)
  DE  aptx_hd         raw aptX HD (Audio Processing Technology for Bluetooth)
+ DE  apv             APV raw bitstream
  D   aqtitle         AQTitle subtitles
  DE  argo_asf        Argonaut Games ASF
  D   argo_brp        Argonaut Games BRP
@@ -138,6 +139,7 @@ Formats:
  DE  g723_1          raw G.723.1
  DE  g726            raw big-endian G.726 ("left-justified")
  DE  g726le          raw little-endian G.726 ("right-justified")
+ D   g728            raw G.728
  D   g729            G.729 raw format demuxer
  D d gdigrab         GDI API Windows frame grabber
  D   gdv             Gremlin Digital Video
@@ -190,6 +192,7 @@ Formats:
  D   laf             LAF (Limitless Audio Format)
   E  latm            LOAS/LATM
  D d lavfi           Libavfilter virtual input device
+ DE  lc3             LC3 (Low Complexity Communication Codec)
  D   libgme          Game Music Emu demuxer
  D   libopenmpt      Tracker formats (libopenmpt)
  D   live_flv        live RTMP FLV (Flash Video)
@@ -203,7 +206,7 @@ Formats:
   E  matroska        Matroska
  D   matroska,webm   Matroska / WebM
  D   mca             MCA Audio Format
- D   mcc             MacCaption
+ DE  mcc             MacCaption
   E  md5             MD5 testing
  D   mgsts           Metal Gear Solid: The Twin Snakes
  DE  microdvd        MicroDVD subtitle format
@@ -288,7 +291,7 @@ Formats:
  D   qoi_pipe        piped qoi sequence
  D   r3d             REDCODE R3D
  DE  rawvideo        raw video
-  E  rcwt            RCWT (Raw Captions With Time)
+ DE  rcwt            RCWT (Raw Captions With Time)
  D   realtext        RealText subtitle format
  D   redspark        RedSpark
  D   rka             RKA (RK Audio)
@@ -315,7 +318,6 @@ Formats:
  D   sbg             SBaGen binaural beats script
  DE  scc             Scenarist Closed Captions
  D   scd             Square Enix SCD
-  Ed sdl,sdl2        SDL2 output device
  D   sdns            Xbox SDNS
  D   sdp             SDP
  D   sdr2            SDR2
@@ -402,6 +404,7 @@ Formats:
   E  webp            WebP
  D   webp_pipe       piped webp sequence
  DE  webvtt          WebVTT subtitle
+  E  whip            WHIP(WebRTC-HTTP ingestion protocol) muxer
  DE  wsaud           Westwood Studios audio
  D   wsd             Wideband Single-bit Data (WSD)
  D   wsvqa           Westwood Studios VQA

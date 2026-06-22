@@ -23,14 +23,15 @@ Codecs:
  D.V.L. anm                  Deluxe Paint Animation
  D.V.L. ansi                 ASCII/ANSI art
  DEV..S apng                 APNG (Animated Portable Network Graphics) image
+ DEVIL. apv                  Advanced Professional Video (encoders: liboapv)
  D.V.L. arbc                 Gryphon's Anim Compressor
  D.V.L. argo                 Argonaut Games Video
  DEVIL. asv1                 ASUS V1
  DEVIL. asv2                 ASUS V2
  D.VIL. aura                 Auravision AURA
  D.VIL. aura2                Auravision Aura 2
- DEV.L. av1                  Alliance for Open Media AV1 (decoders: libdav1d libaom-av1 av1 av1_cuvid av1_qsv) (encoders: libaom-av1 librav1e av1_nvenc av1_qsv av1_amf av1_vaapi)
- D.V... avrn                 Avid AVI Codec
+ DEV.L. av1                  Alliance for Open Media AV1 (decoders: libdav1d libaom-av1 av1 av1_cuvid av1_qsv av1_amf) (encoders: libaom-av1 librav1e libsvtav1 av1_nvenc av1_qsv av1_amf av1_mf av1_vaapi av1_vulkan)
+ D.VI.S avrn                 Avid AVI Codec
  DEVI.S avrp                 Avid 1:1 10-bit RGB Packer
  D.V.L. avs                  AVS (Audio Video Standard) video
  DEV.L. avs2                 AVS2-P2/IEEE1857.4 (decoders: libdavs2) (encoders: libxavs2)
@@ -64,6 +65,7 @@ Codecs:
  D.V.L. dfa                  Chronomaster DFA
  DEV.LS dirac                Dirac (encoders: vc2)
  DEVIL. dnxhd                VC3/DNxHD
+ ..VI.S dnxuc                DNxUncompressed / SMPTE RDD 50
  DEVI.S dpx                  DPX (Digital Picture Exchange) image
  D.V.L. dsicinvideo          Delphine Software International CIN video
  DEVIL. dvvideo              DV (Digital Video)
@@ -74,7 +76,7 @@ Codecs:
  D.V.L. escape130            Escape 130
  ..V.L. evc                  MPEG-5 EVC (Essential Video Coding)
  DEVILS exr                  OpenEXR image
- DEV..S ffv1                 FFmpeg video codec #1
+ DEV..S ffv1                 FFmpeg video codec #1 (encoders: ffv1 ffv1_vulkan)
  DEVI.S ffvhuff              Huffyuv FFmpeg variant
  D.V.L. fic                  Mirillis FIC
  DEVI.S fits                 FITS (Flexible Image Transport System)
@@ -93,10 +95,10 @@ Codecs:
  DEV.L. h263                 H.263 / H.263-1996, H.263+ / H.263-1998 / H.263 version 2
  D.V.L. h263i                Intel H.263
  DEV.L. h263p                H.263+ / H.263-1998 / H.263 version 2
- DEV.LS h264                 H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10 (decoders: h264 h264_qsv libopenh264 h264_cuvid) (encoders: libx264 libx264rgb libopenh264 h264_amf h264_mf h264_nvenc h264_qsv h264_vaapi)
+ DEV.LS h264                 H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10 (decoders: h264 h264_qsv libopenh264 h264_amf h264_cuvid) (encoders: libx264 libx264rgb libopenh264 h264_amf h264_mf h264_nvenc h264_qsv h264_vaapi h264_vulkan)
  DEVIL. hap                  Vidvox Hap
  DEVIL. hdr                  HDR (Radiance RGBE format) image
- DEV.L. hevc                 H.265 / HEVC (High Efficiency Video Coding) (decoders: hevc hevc_qsv hevc_cuvid) (encoders: libx265 hevc_amf hevc_mf hevc_nvenc hevc_qsv hevc_vaapi libkvazaar)
+ DEV.L. hevc                 H.265 / HEVC (High Efficiency Video Coding) (decoders: hevc hevc_qsv hevc_amf hevc_cuvid) (encoders: libx265 hevc_amf hevc_d3d12va hevc_mf hevc_nvenc hevc_qsv hevc_vaapi hevc_vulkan libkvazaar)
  D.V.L. hnm4video            HNM 4 video
  D.VIL. hq_hqa               Canopus HQ/HQA
  D.VIL. hqx                  Canopus HQX
@@ -116,7 +118,8 @@ Codecs:
  DEVILS jpeg2000             JPEG 2000 (encoders: jpeg2000 libopenjpeg)
  DEVILS jpegls               JPEG-LS
  DEVILS jpegxl               JPEG XL (decoders: libjxl) (encoders: libjxl)
- D.VIL. jv                   Bitmap Brothers JV video
+ DEV.LS jpegxl_anim          JPEG XL animated (decoders: libjxl_anim) (encoders: libjxl_anim)
+ D.V.L. jv                   Bitmap Brothers JV video
  D.V.L. kgv1                 Kega Game Video
  D.V.L. kmvc                 Karl Morton's video codec
  D.VI.S lagarith             Lagarith lossless
@@ -169,12 +172,13 @@ Codecs:
  DEVI.S pgmyuv               PGMYUV (Portable GrayMap YUV) image
  D.VI.S pgx                  PGX (JPEG2000 Test Format)
  DEVI.S phm                  PHM (Portable HalfFloatMap) image
- D.V.L. photocd              Kodak Photo CD
+ D.VIL. photocd              Kodak Photo CD
  D.VIL. pictor               Pictor/PC Paint
  D.VIL. pixlet               Apple Pixlet
  DEV..S png                  PNG (Portable Network Graphics) image
  DEVI.S ppm                  PPM (Portable PixelMap) image
  DEVIL. prores               Apple ProRes (iCodec Pro) (encoders: prores prores_aw prores_ks)
+ D.VIL. prores_raw           Apple ProRes RAW
  D.VIL. prosumer             Brooktree ProSumer Video
  D.VI.S psd                  Photoshop PSD file
  D.VIL. ptx                  V.Flash PTX image
@@ -195,6 +199,7 @@ Codecs:
  DEV.L. rv20                 RealVideo 2.0
  D.V.L. rv30                 RealVideo 3.0
  D.V.L. rv40                 RealVideo 4.0
+ D.V.L. rv60                 RealVideo 6.0
  D.V.L. sanm                 LucasArts SANM/SMUSH video
  D.V.LS scpr                 ScreenPressor
  D.V..S screenpresso         Screenpresso
@@ -240,7 +245,7 @@ Codecs:
  DEVI.S v410                 Uncompressed 4:4:4 10-bit
  D.V.L. vb                   Beam Software VB
  D.VI.S vble                 VBLE Lossless Codec
- DEV.L. vbn                  Vizrt Binary Image
+ DEVIL. vbn                  Vizrt Binary Image
  D.V.L. vc1                  SMPTE VC-1 (decoders: vc1 vc1_qsv vc1_cuvid)
  D.V.L. vc1image             Windows Media Video 9 Image v2
  D.VIL. vcr1                 ATI VCR1
@@ -257,9 +262,9 @@ Codecs:
  D.V.L. vp6f                 On2 VP6 (Flash version)
  D.V.L. vp7                  On2 VP7
  DEV.L. vp8                  On2 VP8 (decoders: vp8 libvpx vp8_cuvid vp8_qsv) (encoders: libvpx vp8_vaapi)
- DEV.L. vp9                  Google VP9 (decoders: vp9 libvpx-vp9 vp9_cuvid vp9_qsv) (encoders: libvpx-vp9 vp9_vaapi vp9_qsv)
+ DEV.L. vp9                  Google VP9 (decoders: vp9 libvpx-vp9 vp9_amf vp9_cuvid vp9_qsv) (encoders: libvpx-vp9 vp9_vaapi vp9_qsv)
  D.V.L. vqc                  ViewQuest VQC
- D.V.L. vvc                  H.266 / VVC (Versatile Video Coding)
+ DEV.L. vvc                  H.266 / VVC (Versatile Video Coding) (decoders: vvc vvc_qsv) (encoders: libvvenc)
  DEVI.S wbmp                 WBMP (Wireless Application Protocol Bitmap) image
  D.V..S wcmv                 WinCAM Motion Video
  DEVILS webp                 WebP (encoders: libwebp_anim libwebp)
@@ -287,8 +292,8 @@ Codecs:
  ..AIL. 4gv                  4GV (Fourth Generation Vocoder)
  D.AIL. 8svx_exp             8SVX exponential
  D.AIL. 8svx_fib             8SVX fibonacci
- DEAIL. aac                  AAC (Advanced Audio Coding) (decoders: aac aac_fixed) (encoders: aac aac_mf)
- D.AIL. aac_latm             AAC LATM (Advanced Audio Coding LATM syntax)
+ DEA.L. aac                  AAC (Advanced Audio Coding) (decoders: aac aac_fixed) (encoders: aac aac_mf)
+ D.A.L. aac_latm             AAC LATM (Advanced Audio Coding LATM syntax)
  DEAIL. ac3                  ATSC A/52A (AC-3) (decoders: ac3 ac3_fixed) (encoders: ac3 ac3_fixed ac3_mf)
  ..A.L. ac4                  AC-4
  D.AIL. acelp.kelvin         Sipro ACELP.KELVIN
@@ -330,9 +335,11 @@ Codecs:
  DEAIL. adpcm_ima_ssi        ADPCM IMA Simon & Schuster Interactive
  DEAIL. adpcm_ima_wav        ADPCM IMA WAV
  DEAIL. adpcm_ima_ws         ADPCM IMA Westwood
+ D.AIL. adpcm_ima_xbox       ADPCM IMA Xbox
  DEAIL. adpcm_ms             ADPCM Microsoft
  D.AIL. adpcm_mtaf           ADPCM MTAF
  D.AIL. adpcm_psx            ADPCM Playstation
+ D.AIL. adpcm_sanyo          ADPCM Sanyo
  D.AIL. adpcm_sbpro_2        ADPCM Sound Blaster Pro 2-bit
  D.AIL. adpcm_sbpro_3        ADPCM Sound Blaster Pro 2.6-bit
  D.AIL. adpcm_sbpro_4        ADPCM Sound Blaster Pro 4-bit
@@ -386,6 +393,7 @@ Codecs:
  DEAI.S flac                 FLAC (Free Lossless Audio Codec)
  D.AIL. ftr                  FTR Voice
  DEAIL. g723_1               G.723.1
+ D.AIL. g728                 G.728
  D.AIL. g729                 G.729
  D.AIL. gremlin_dpcm         DPCM Gremlin
  D.AIL. gsm                  GSM
@@ -397,6 +405,7 @@ Codecs:
  D.AIL. imc                  IMC (Intel Music Coder)
  D.AIL. interplay_dpcm       DPCM Interplay
  D.AIL. interplayacm         Interplay ACM
+ ..AIL. lc3                  LC3 (Low Complexity Communication Codec)
  D.AIL. mace3                MACE (Macintosh Audio Compression/Expansion) 3:1
  D.AIL. mace6                MACE (Macintosh Audio Compression/Expansion) 6:1
  D.AIL. metasound            Voxware MetaSound
@@ -469,8 +478,8 @@ Codecs:
  D.AIL. smackaudio           Smacker audio (decoders: smackaud)
  ..AIL. smv                  SMV (Selectable Mode Vocoder)
  D.AIL. sol_dpcm             DPCM Sol
- DEAI.. sonic                Sonic
- .EAI.. sonicls              Sonic lossless
+ D.AI.. sonic                Sonic
+ ..AI.. sonicls              Sonic lossless
  D.AIL. speex                Speex
  D.A..S tak                  TAK (Tom's lossless Audio Kompressor)
  DEA..S truehd               TrueHD
@@ -496,10 +505,12 @@ Codecs:
  ..D... dvd_nav_packet       DVD Nav packet
  ..D... epg                  Electronic Program Guide
  ..D... klv                  SMPTE 336M Key-Length-Value (KLV) metadata
+ ..D... lcevc                LCEVC (Low Complexity Enhancement Video Coding) / MPEG-5 LCEVC / MPEG-5 part 2
  ..D... mpegts               raw MPEG-TS stream
  ..D... otf                  OpenType font
  ..D... scte_35              SCTE 35 Message Queue
  ..D... smpte_2038           SMPTE ST 2038 VANC in MPEG-2 TS
+ ..D... smpte_436m_anc       MXF SMPTE-436M ANC
  ..D... timed_id3            timed ID3 metadata
  ..D... ttf                  TrueType font
  D.S... arib_caption         ARIB STD-B24 caption (decoders: libaribcaption libaribb24)
@@ -510,6 +521,7 @@ Codecs:
  D.S... eia_608              EIA-608 closed captions (decoders: cc_dec)
  D.S... hdmv_pgs_subtitle    HDMV Presentation Graphic Stream subtitles (decoders: pgssub)
  ..S... hdmv_text_subtitle   HDMV Text subtitle
+ ..S... ivtv_vbi             ivtv VBI captions
  D.S... jacosub              JACOsub subtitle
  D.S... microdvd             MicroDVD subtitle
  DES... mov_text             MOV text
