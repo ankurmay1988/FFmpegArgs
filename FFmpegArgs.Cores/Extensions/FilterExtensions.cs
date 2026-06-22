@@ -32,6 +32,9 @@
               .Replace(@",", @"\,")
               .Replace("\"", "\\\"");
         }
+        // Lv3 (mức process arg / shell): hien chua can vi thuc thi qua ProcessStartInfo.ArgumentList
+        // (UseShellExecute=false) nen khong co tang shell de escape. Giu lai stub cho truong hop
+        // tuong lai can build chuoi command qua shell.
         ///// <summary>
         ///// process arg level
         ///// </summary>
