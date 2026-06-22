@@ -1,0 +1,11 @@
+mode: ManualDeployment
+tag-prefix: 'v'
+branches:
+  master:
+    regex: ^master$
+    increment: None
+    label: ''
+  main:
+    regex: ^main$
+    increment: None
+    label: ''

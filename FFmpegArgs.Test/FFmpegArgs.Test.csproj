@@ -6,6 +6,8 @@
 		<AssemblyVersion>1.0.0.0</AssemblyVersion>
 		<FileVersion>1.0.0.0</FileVersion>
 		<GenerateDocumentationFile>False</GenerateDocumentationFile>
+		<!-- Project test không pack, không cần GitVersion -->
+		<EnableGitVersion>false</EnableGitVersion>
 	</PropertyGroup>
 	
 	<PropertyGroup>
