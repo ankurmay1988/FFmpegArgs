@@ -1,0 +1,78 @@
+# FFmpegArgs — Roadmap phát triển
+
+> Đề xuất kế hoạch phát triển dựa trên hiện trạng codebase (xem [CODEBASE_SUMMARY.md](CODEBASE_SUMMARY.md)).
+> Phiên bản hiện tại: **2.2**. Đây là *đề xuất* — thứ tự ưu tiên có thể điều chỉnh theo nhu cầu thực tế.
+> Quy ước: **P0** = sửa gấp · **P1** = hoàn thiện tính năng dở · **P2** = mở rộng độ phủ · **P3** = chất lượng & hạ tầng · **P4** = nâng cao.
+
+---
+
+## Bảng tổng hợp ưu tiên
+
+| Ưu tiên | Mục tiêu | Phiên bản đề xuất | Quy mô |
+|---------|----------|-------------------|--------|
+| P0 | Sửa bug `filter_complex_script` của FFplay | 2.2.x (patch) | Nhỏ |
+| P1 | Hoàn thiện Sinks, FilterStringInput, execute cho FFplay | 2.3 | Vừa |
+| P2 | Mở rộng codec audio, demuxer/muxer options, subtitle, làm giàu filter generated | 2.4 | Lớn |
+| P3 | Unit test không phụ thuộc ffmpeg, CI/CD, symbol package, tài liệu | 2.4–2.5 | Vừa |
+| P4 | ffprobe wrapper, hwupload/hwdownload, source-generator hóa autogen, AOT/trim | 3.0 | Lớn |
+
+---
+
+## P0 — Sửa lỗi gấp (patch 2.2.x)
+
+- [ ] **Sửa bug FFplay**: [FFplayArg.cs:152](../FFplayArgs/FFplayArg.cs#L152) đang dùng `"filter_complex_script"` thiếu dấu `-`, phải là `"-filter_complex_script"` (đối chiếu [FFmpegArg.cs:226](../FFmpegArgs/FFmpegArg.cs#L226)). Thêm test chống tái phát.
+- [ ] **Rà soát escaping**: bổ sung test cho ký tự đặc biệt (`'`, `:`, `\`, `[]`, `,`, `;`) trong [FilterExtensions.cs](../FFmpegArgs.Cores/Extensions/FilterExtensions.cs); quyết định có cần hoàn thiện `FiltergraphEscapingLv3` (mức argument) hay xóa hẳn.
+
+---
+
+## P1 — Hoàn thiện tính năng còn dở (2.3)
+
+- [ ] **Sink filters**: hiện thực [BuffersinkFilter](../FFmpegArgs.Filters.VideoSinks/Filters/BuffersinkFilter.cs) (`V->|`) và `abuffersink` (`A->|`) — cần khái niệm "filter không có map out" trong [BaseFilter](../FFmpegArgs.Cores/Filters/BaseFilter.cs)/[FilterChain](../FFmpegArgs.Cores/Filters/FilterChain.cs) để dùng được với `lavfi`/filter-script. Bỏ comment & bổ sung test.
+- [ ] **`FilterStringInput`** (lavfi): kích hoạt lại [FilterStringInput.cs](../FFmpegArgs.Inputs/FilterStringInput.cs) cho phép dùng filtergraph làm input (`-f lavfi -i "..."`).
+- [ ] **Execute cho FFplay**: thêm `FFplayRender`/`FFplayRenderConfig` tương tự [FFmpegRender](../FFmpegArgs.Executes/FFmpegRender.cs) (hoặc tách phần chạy process dùng chung). Hiện [FFplayArgs/](../FFplayArgs/) chỉ sinh args, chưa chạy được.
+- [ ] **Hủy tiến trình**: kiểm tra `CancellationToken` trong [FFmpegRender](../FFmpegArgs.Executes/FFmpegRender.cs) có thực sự kill process ffmpeg (gửi `q`/Kill) khi hủy; thêm test timeout.
+
+---
+
+## P2 — Mở rộng độ phủ (2.4)
+
+- [ ] **Audio encoder wrappers**: bổ sung lớp encoder chuyên biệt (aac, libfdk_aac, libmp3lame, libopus, ac3, flac...) song song với độ phủ video hiện có trong [FFmpegArgs.Codec/](../FFmpegArgs.Codec/) (hiện audio chủ yếu qua extension thô).
+- [ ] **Demuxer/Muxer options**: lấp đầy `FFmpegArgs.Inputs.Demuxers` & `FFmpegArgs.Outputs.Muxers` (đang trống) bằng option đặc thù phổ biến (concat, image2, hls, dash, mp4 movflags, rawvideo...).
+- [ ] **Subtitle**: hoàn thiện stream/option subtitle (mux/burn-in, `-c:s`, charenc, `subtitles`/`ass` filter).
+- [ ] **Làm giàu filter generated**: nâng cấp [Autogens/Filter/FiltersGen.cs](../Autogens/Filter/FiltersGen.cs):
+  - Hỗ trợ thêm loại bị bỏ qua (`N->N`, `|->N`) — xem danh sách `.other/NotAutoGen_window.txt`.
+  - Tự gắn `ITimelineSupport`/`ICommandSupport`/`ISliceThreading` theo cờ `T/S/C` từ `ffmpeg -filters`.
+  - Nhận diện tham số kiểu expression để dùng `ExpressionValue` thay vì string.
+- [ ] **Đồng bộ ffmpeg version**: cập nhật bản dump trong [.other/](../.other/) lên ffmpeg mới, chạy lại [Autogens](../Autogens/Program.cs), ghi chú ffmpeg version tối thiểu được hỗ trợ.
+
+---
+
+## P3 — Chất lượng & hạ tầng (2.4–2.5)
+
+- [ ] **Tách unit test khỏi ffmpeg thật**: phần lớn test trong [FFmpegArgs.Test/](../FFmpegArgs.Test/) cần ffmpeg + media cục bộ. Bổ sung tầng test "chỉ so khớp chuỗi argument" (không chạy process) để chạy được trên CI; đánh dấu `[TestCategory("Integration")]` cho test cần ffmpeg.
+- [ ] **CI/CD GitHub Actions**: build matrix (netstandard2.0/net6/net8), chạy unit test, (tùy chọn) cài ffmpeg để chạy integration, tự đóng gói & publish NuGet khi tag. Thay thế quy trình thủ công [NugetAll.ps1](../NugetAll.ps1).
+- [ ] **Symbol package**: phát hành `.snupkg` (Source Link) thay vì nhúng `.pdb`, để debug từ NuGet.
+- [x] **Versioning tự động** (đã làm): GitVersion ([GitVersion.yml](../GitVersion.yml)) thay `FileVersion` thủ công + biến `$build`. Tag `vM.m.0` → package `M.m.<commits>`; script pack chỉ chạy ở `master`. Còn lại: cân nhắc tích hợp vào CI.
+- [ ] **Tài liệu**: trang ví dụ theo nhóm tính năng (filter graph, pipe, codec phần cứng, progress) dựa trên [README.MD](../README.MD); cân nhắc DocFX trang API.
+- [ ] **Văn hóa Culture**: README đã cảnh báo về dấu thập phân/Turkish-i; cân nhắc ép `InvariantCulture` nội bộ khi format số/enum để người dùng không phải tự `CultureScope`.
+
+---
+
+## P4 — Tính năng nâng cao (3.0)
+
+- [ ] **ffprobe wrapper**: project mới `FFprobeArgs` trả về metadata có cấu trúc (duration, streams, codec, resolution) — bổ trợ tự nhiên cho ffmpeg.
+- [ ] **Chuỗi tăng tốc phần cứng**: hỗ trợ `-hwaccel`, `hwupload`/`hwdownload`, `-init_hw_device`, format trung gian GPU để dùng trọn vẹn [OpenCLVideoFilters](../FFmpegArgs.Filters.OpenCLVideoFilters/) / [VAAPIVideoFilters](../FFmpegArgs.Filters.VAAPIVideoFilters/).
+- [ ] **Validate đồ thị mạnh hơn**: phát hiện sớm map dùng 2 lần, lệch kiểu audio/video, sink/source không khớp — báo lỗi rõ ràng tại thời điểm dựng thay vì khi chạy ffmpeg.
+- [ ] **Autogen bằng Roslyn Source Generator**: chuyển [Autogens](../Autogens/) (console app sinh file `.g.cs`) sang incremental source generator để filter generated luôn đồng bộ khi build (giảm rủi ro lệch nguồn).
+- [ ] **AOT / trimming friendly**: kiểm tra tương thích NativeAOT/trimming (tránh reflection runtime), gắn annotation phù hợp.
+- [ ] **API streaming nâng cao**: helper cho realtime/streaming output (RTMP/SRT/HLS), và pipe đồng thời nhiều stream.
+
+---
+
+## Nguyên tắc khi mở rộng
+
+1. **Giữ tính nhất quán API**: filter mới theo đúng mẫu `BaseXToYFilter` + extension `this Map` + `AddMapOut()` (xem [ScaleFilter.cs](../FFmpegArgs.Filters.VideoFilters/Filters/ScaleFilter.cs)).
+2. **Ưu tiên auto-generate** cho filter đơn giản; chỉ viết tay khi cần expression/validate/nhiều overload.
+3. **Mỗi tính năng kèm test build-args** (không cần ffmpeg) để chạy được trên CI.
+4. **Tôn trọng multi-target** netstandard2.0 (tránh API chỉ có ở net mới mà không guard `#if`).
+5. **Cập nhật [CODEBASE_SUMMARY.md](CODEBASE_SUMMARY.md)** khi thêm project/đổi kiến trúc.
