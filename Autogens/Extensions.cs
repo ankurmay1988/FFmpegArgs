@@ -41,7 +41,7 @@ namespace Autogens
         {
             if (string.IsNullOrWhiteSpace(input)) return input;
             if (int.TryParse(input.First().ToString(), out int r)) return $"_{input}";
-            return input.First().ToString().ToUpper() + input.Substring(1);
+            return input.First().ToString().ToUpperInvariant() + input.Substring(1);
         }
 
 
