@@ -1,0 +1,57 @@
+name: Release
+
+# Khi push commit len branch 'release':
+#   1. pack tat ca package (Version = MAJOR.MINOR.<so commit ke tu tag vM.m.0> qua GitVersion)
+#   2. upload .nupkg len GitHub Release, gom theo minor (asset dinh vao release cua tag vM.m.0)
+#   3. push nuget.org -- CHI khi repo co secret NUGET_KEY
+#
+# Chay tren windows-latest de tai dung module PowerShell san co (FunctionModule.psm1, duong dan backslash).
+# Tag vM.m.0 phai ton tai & da push len origin (PublishGithubReleases / --verify-tag yeu cau).
+
+on:
+  push:
+    branches:
+      - release
+  workflow_dispatch:
+
+permissions:
+  contents: write   # tao/sua GitHub Release + upload asset
+
+jobs:
+  release:
+    name: Pack & publish
+    runs-on: windows-latest
+    env:
+      # Map secret ra job-level de buoc 'if' cua step push doc duoc (secret khong dung truc tiep trong if).
+      NUGET_KEY: ${{ secrets.NUGET_KEY }}
+    steps:
+      - name: Checkout (full history + tags, on 'release' branch)
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.ref_name }}
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Pack & upload to GitHub Release
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          Import-Module ./FunctionModule.psm1 -Force
+          $names = Get-PackageIds
+          if (-not (NugetPack @names))            { Write-Error "pack failed";            exit 1 }
+          if (-not (PublishGithubReleases @names)) { Write-Error "github release failed"; exit 1 }
+
+      - name: Push to nuget.org (only if NUGET_KEY secret is set)
+        if: ${{ env.NUGET_KEY != '' }}
+        shell: pwsh
+        env:
+          nugetKey: ${{ secrets.NUGET_KEY }}
+        run: |
+          Import-Module ./FunctionModule.psm1 -Force
+          $names = Get-PackageIds
+          NugetPush @names

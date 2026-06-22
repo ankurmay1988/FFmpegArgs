@@ -1,33 +1,20 @@
 Import-Module .\FunctionModule.psm1 -Force
 
-# NuGet pack/push is only allowed on the 'master' branch.
-if (-not (Assert-MasterBranch)) { pause; return }
+# NuGet pack/push is only allowed on the 'release' branch.
+if (-not (Assert-ReleaseBranch)) { pause; return }
 
-$names= @(
-    "FFmpegArgs",
-    "FFmpegArgs.Codec",
-    "FFmpegArgs.Cores",
-    "FFmpegArgs.Executes",
-    "FFmpegArgs.Extensions",
-    "FFmpegArgs.Filters",
-    "FFmpegArgs.Filters.AudioFilters",
-    #"FFmpegArgs.Filters.AudioSinks",
-    "FFmpegArgs.Filters.AudioSources",
-    "FFmpegArgs.Filters.Generated",
-    "FFmpegArgs.Filters.Multimedia",
-    #"FFmpegArgs.Filters.MultimediaSources",
-    "FFmpegArgs.Filters.OpenCLVideoFilters",
-    #"FFmpegArgs.Filters.VAAPIVideoFilters",
-    "FFmpegArgs.Filters.VideoFilters",
-    #"FFmpegArgs.Filters.VideoSinks",
-    "FFmpegArgs.Filters.VideoSources",
-    "FFmpegArgs.Inputs",
-    "FFmpegArgs.Outputs"
-)
+# Package list is shared with the release CI workflow (single source of truth).
+$names = Get-PackageIds
 
 $result = NugetPack @names
 if($result)
 {
+    # Publish .nupkg to GitHub Releases (grouped by minor: assets attached to vM.m.0).
+    Write-Host "enter to publish .nupkg to GitHub Releases"
+    pause
+    $pub = PublishGithubReleases @names
+    if (-not $pub) { Write-Host "GitHub release publish had errors" }
+
     if([string]::IsNullOrEmpty($env:nugetKey))
     {
         Write-Host "Build & pack success"

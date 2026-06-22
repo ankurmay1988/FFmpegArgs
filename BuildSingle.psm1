@@ -2,8 +2,8 @@ Import-Module $PSScriptRoot\FunctionModule.psm1 -Force
 
 function NugetBuildSingle
 {
-	# NuGet pack/push is only allowed on the 'master' branch.
-	if (-not (Assert-MasterBranch)) { pause; return }
+	# NuGet pack/push is only allowed on the 'release' branch.
+	if (-not (Assert-ReleaseBranch)) { pause; return }
 
 	$projectName= $args[0];
 
@@ -11,6 +11,12 @@ function NugetBuildSingle
 	$result = NugetPack $projectName
 	if($result)
     {
+        # Publish .nupkg to GitHub Releases (grouped by minor: asset attached to vM.m.0).
+        Write-Host "enter to publish .nupkg to GitHub Releases"
+        pause
+        $pub = PublishGithubReleases $projectName
+        if (-not $pub) { Write-Host "GitHub release publish had errors" }
+
         if([string]::IsNullOrEmpty($env:nugetKey))
         {
             Write-Host "Build & pack success"
