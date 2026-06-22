@@ -1,7 +1,9 @@
-﻿namespace FFmpegArgs.Cores
+﻿using System.Globalization;
+
+namespace FFmpegArgs.Cores
 {
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public abstract class BaseOption : IOption
     {
@@ -97,9 +99,14 @@
         {
             if (string.IsNullOrEmpty(key)) 
                 throw new ArgumentNullException(nameof(key));
-            if (val is null) 
+            if (val is null)
                 throw new ArgumentNullException(nameof(val));
-            return baseOption.SetOption(key, val.ToString(), throwIfDuplicate);
+            // Format numbers/IFormattable values with InvariantCulture so ffmpeg never receives a
+            // localized decimal separator (e.g. "0,5") on cultures like vi-VN/de-DE.
+            string? text = val is IFormattable formattable
+                ? formattable.ToString(null, CultureInfo.InvariantCulture)
+                : val.ToString();
+            return baseOption.SetOption(key, text!, throwIfDuplicate);
         }
         /// <summary>
         /// 
@@ -128,7 +135,7 @@
                 throw new ArgumentNullException(nameof(key));
             if (val < min || val > max) 
                 throw new InvalidRangeException($"Range Required: {min} <= {key} <= {max}");
-            return baseOption.SetOption(key, val.ToString(), throwIfDuplicate);
+            return baseOption.SetOption(key, (object)val, throwIfDuplicate);
         }
         /// <summary>
         /// 
@@ -157,7 +164,7 @@
                 throw new ArgumentNullException(nameof(key));
             if (float.IsNaN(val) || val < min || val > max) 
                 throw new InvalidRangeException($"Range Required: {min} <= {key} <= {max}");
-            return baseOption.SetOption(key, val.ToString(), throwIfDuplicate);
+            return baseOption.SetOption(key, (object)val, throwIfDuplicate);
         }
         /// <summary>
         /// 
@@ -186,7 +193,7 @@
                 throw new ArgumentNullException(nameof(key));
             if (double.IsNaN(val) || val < min || val > max) 
                 throw new InvalidRangeException($"Range Required: {min} <= {key} <= {max}");
-            return baseOption.SetOption(key, val.ToString(), throwIfDuplicate);
+            return baseOption.SetOption(key, (object)val, throwIfDuplicate);
         }
         /// <summary>
         /// 
@@ -215,7 +222,7 @@
                 throw new ArgumentNullException(nameof(key));
             if (val < min || val > max) 
                 throw new InvalidRangeException($"Range Required: {min} <= {key} <= {max}");
-            return baseOption.SetOption(key, val.ToString(), throwIfDuplicate);
+            return baseOption.SetOption(key, (object)val, throwIfDuplicate);
         }
         /// <summary>
         /// 
@@ -244,7 +251,7 @@
                 throw new ArgumentNullException(nameof(key));
             if (val < min || val > max) 
                 throw new InvalidRangeException($"Range Required: {min} <= {key} <= {max}");
-            return baseOption.SetOption(key, val.ToString(), throwIfDuplicate);
+            return baseOption.SetOption(key, (object)val, throwIfDuplicate);
         }
         /// <summary>
         /// 
@@ -273,7 +280,7 @@
                 throw new ArgumentNullException(nameof(key));
             if (val < min || val > max) 
                 throw new InvalidRangeException($"Range Required: {min:hh\\:mm\\:ss\\.fff} <= {key:hh\\:mm\\:ss\\.fff} <= {max:hh\\:mm\\:ss\\.fff}");
-            return baseOption.SetOption(key, val.ToString(), throwIfDuplicate);
+            return baseOption.SetOption(key, (object)val, throwIfDuplicate);
         }
     }
 }
