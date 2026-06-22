@@ -9,3 +9,10 @@ branches:
     regex: ^main$
     increment: None
     label: ''
+  # Release branch: same scheme as master (Version = MAJOR.MINOR.<commits since vM.m.0>).
+  # Overrides GitVersion's built-in GitFlow 'release' config so it does NOT add a 'beta' label.
+  release:
+    regex: ^release$
+    increment: None
+    label: ''
+    source-branches: [ master, main, dev ]
