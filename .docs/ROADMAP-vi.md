@@ -13,7 +13,7 @@
 | P0 | Sửa bug FFplay (xong) + **chất lượng & hạ tầng gộp từ P3**: symbol package (ưu tiên 1), tài liệu, ép InvariantCulture | 2.2.x–2.5 | Vừa |
 | P1 | Hoàn thiện Sinks, FilterStringInput, execute cho FFplay | 2.3 | Vừa |
 | P2 | Mở rộng codec audio, demuxer/muxer options, subtitle, làm giàu filter generated | 2.4 | Lớn |
-| P4 | ffprobe wrapper, hwupload/hwdownload, source-generator hóa autogen, AOT/trim | 3.0 | Lớn |
+| P4 | hwupload/hwdownload, source-generator hóa autogen, AOT/trim | 3.0 | Lớn |
 
 ---
 
@@ -56,7 +56,7 @@
 
 ## P4 — Tính năng nâng cao (3.0)
 
-- [x] **ffprobe wrapper** (đã làm — branch `auto/overnight-roadmap`, commit `deefb99`): project mới `FFprobeArgs` self-contained — `FFprobeArg` dựng token-list (`-show_format`/`-show_streams`/`-select_streams`/`-print_format`…) + `FFprobeRender` chạy ffprobe & parse JSON tối thiểu (`System.Text.Json`) ra `format{…}`/`streams[]{…}`. Đăng ký vào `.sln`; 9 test arg-build [FFprobeArgTest.cs](../FFmpegArgs.Test/FFprobeArgTest.cs). Khi release: thêm vào [NugetAll.ps1](../NugetAll.ps1).
+- [x] ~~**ffprobe wrapper**~~ — **BỎ KHỎI ROADMAP**: đã có [FFmpegCore](https://github.com/rosenbjerg/FFMpegCore) cung cấp sẵn ffprobe (`FFProbe.Analyse`/`AnalyseAsync`), không cần tự viết wrapper. Không đưa `FFprobeArgs` vào release.
 - [~] **Chuỗi tăng tốc phần cứng** (một phần — branch `auto/overnight-roadmap`, commit `aeb2aad`): thêm `-hwaccel`/`-hwaccel_device`/`-hwaccel_output_format` (input ext) + `-init_hw_device`/`-filter_hw_device` (global) + enum `HardwareAccel` (12 method); test [HardwareAccelTest.cs](../FFmpegArgs.Test/HardwareAccelTest.cs). `hwupload` đã auto-gen sẵn. **CÒN LẠI**: `hwdownload`/`hwmap`/`hwupload_cuda` (chưa auto-gen) + format trung gian GPU để dùng trọn vẹn [OpenCLVideoFilters](../FFmpegArgs.Filters.OpenCLVideoFilters/) / [VAAPIVideoFilters](../FFmpegArgs.Filters.VAAPIVideoFilters/).
 - [x] **Validate đồ thị mạnh hơn** (đã làm — opt-in **read-only**, branch `auto/overnight-roadmap`, commit `246dad2`): `Validate(this IFFmpegArg)` → `IReadOnlyList<GraphValidationIssue>` (severity) trong [GraphValidationExtension.cs](../FFmpegArgs.Extensions/Validation/GraphValidationExtension.cs); phát hiện input-map reuse, dangling output, no-input/no-output. KHÔNG đổi hành vi throw core. *(filter-output dùng 2 lần & lệch kiểu audio/video vốn đã bị ctor/generic chặn ở compile-time/dựng → không cần check.)*
 - [ ] **Autogen bằng Roslyn Source Generator** (⏭️ defer — đại tu kiến trúc, cần giám sát): chuyển [Autogens](../Autogens/) (console app sinh file `.g.cs`) sang incremental source generator để filter generated luôn đồng bộ khi build (giảm rủi ro lệch nguồn).
